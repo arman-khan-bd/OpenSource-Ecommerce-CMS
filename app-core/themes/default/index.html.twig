@@ -1,0 +1,206 @@
+{% extends "@theme/layout.html.twig" %}
+
+{% block content %}
+<!-- Modern Hero Section -->
+<section class="relative overflow-hidden pt-12 pb-20 lg:pt-20 lg:pb-32">
+    <!-- Ambient Dynamic Glow Backgrounds -->
+    <div class="absolute inset-0 -z-10 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-indigo-900/40 via-slate-950 to-slate-950"></div>
+    <div class="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[350px] bg-brand-600/15 rounded-full blur-[120px] pointer-events-none"></div>
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center max-w-4xl mx-auto space-y-6">
+            <!-- Badge -->
+            <div class="inline-flex items-center space-x-2.5 px-4 py-1.5 rounded-full bg-brand-500/10 border border-brand-500/30 text-brand-300 text-xs font-bold tracking-wide uppercase shadow-lg shadow-brand-500/10 backdrop-blur-md">
+                <span class="w-2 h-2 rounded-full bg-brand-400 animate-ping"></span>
+                <span>OpenSource eCommerce CMS</span>
+                <span class="text-slate-500">•</span>
+                <span class="text-indigo-200">WordPress Alternative</span>
+            </div>
+
+            <!-- Title -->
+            <h1 class="text-4xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight font-display text-white leading-tight">
+                Crafted for Speed. <br/>
+                <span class="gradient-text">Engineered for Visionaries.</span>
+            </h1>
+
+            <!-- Subtitle -->
+            <p class="text-lg sm:text-xl text-slate-400 font-normal leading-relaxed max-w-2xl mx-auto">
+                {{ site.description|default('The modern, lightweight, monolithic & headless alternative to WordPress. Powered by Symfony 7, Vue 3 Inertia, and Android SDUI.') }}
+            </p>
+
+            <!-- CTA Action Buttons -->
+            <div class="pt-4 flex flex-col sm:flex-row items-center justify-center gap-4">
+                <a href="/shop" class="w-full sm:w-auto px-8 py-4 rounded-2xl bg-gradient-to-r from-brand-600 via-indigo-600 to-purple-600 hover:from-brand-500 hover:to-indigo-500 text-white font-bold shadow-xl shadow-brand-500/30 transition-all text-sm flex items-center justify-center space-x-2 group">
+                    <span>Shop Featured Gear</span>
+                    <svg class="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+                </a>
+                <button onclick="window.CartManager.openDrawer()" class="w-full sm:w-auto px-8 py-4 rounded-2xl bg-slate-900/90 hover:bg-slate-800 text-slate-200 border border-slate-700/80 font-bold transition-all text-sm flex items-center justify-center space-x-2 shadow-lg">
+                    <svg class="w-4 h-4 text-brand-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/></svg>
+                    <span>View Shopping Bag</span>
+                </button>
+            </div>
+
+            <!-- Category Pills Row -->
+            <div class="pt-6 flex flex-wrap items-center justify-center gap-2 text-xs">
+                <span class="text-slate-500 font-medium mr-1">Trending Tags:</span>
+                <a href="/shop" class="px-3 py-1 rounded-xl bg-slate-900/80 border border-slate-800 hover:border-brand-500/50 text-slate-300 hover:text-white transition-all">🎧 Audio</a>
+                <a href="/shop" class="px-3 py-1 rounded-xl bg-slate-900/80 border border-slate-800 hover:border-brand-500/50 text-slate-300 hover:text-white transition-all">⌨️ Keyboards</a>
+                <a href="/shop" class="px-3 py-1 rounded-xl bg-slate-900/80 border border-slate-800 hover:border-brand-500/50 text-slate-300 hover:text-white transition-all">⚡ Gadgets</a>
+                <a href="/shop" class="px-3 py-1 rounded-xl bg-slate-900/80 border border-slate-800 hover:border-brand-500/50 text-slate-300 hover:text-white transition-all">💻 Peripherals</a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Feature Guarantee Highlights -->
+<section class="border-y border-slate-800/80 bg-slate-900/40 py-8 backdrop-blur-md">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+        <div class="p-4 rounded-2xl bg-slate-900/60 border border-slate-800/60 flex flex-col items-center">
+            <span class="text-2xl mb-1">🚀</span>
+            <span class="font-bold text-sm text-white font-display">Instant Local & Server Setup</span>
+            <span class="text-[11px] text-slate-400 mt-0.5">Zero Terminal SQLite / MySQL</span>
+        </div>
+        <div class="p-4 rounded-2xl bg-slate-900/60 border border-slate-800/60 flex flex-col items-center">
+            <span class="text-2xl mb-1">📦</span>
+            <span class="font-bold text-sm text-brand-300 font-display">Free Express Shipping</span>
+            <span class="text-[11px] text-slate-400 mt-0.5">On all orders over $100</span>
+        </div>
+        <div class="p-4 rounded-2xl bg-slate-900/60 border border-slate-800/60 flex flex-col items-center">
+            <span class="text-2xl mb-1">📱</span>
+            <span class="font-bold text-sm text-purple-300 font-display">Native Android SDUI</span>
+            <span class="text-[11px] text-slate-400 mt-0.5">Headless Server-Driven UI</span>
+        </div>
+        <div class="p-4 rounded-2xl bg-slate-900/60 border border-slate-800/60 flex flex-col items-center">
+            <span class="text-2xl mb-1">🛡️</span>
+            <span class="font-bold text-sm text-emerald-300 font-display">Secure Cart & Checkout</span>
+            <span class="text-[11px] text-slate-400 mt-0.5">256-Bit SSL Encrypted</span>
+        </div>
+    </div>
+</section>
+
+<!-- Featured Products Section -->
+<section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
+    <div class="flex flex-col sm:flex-row sm:items-end justify-between mb-12">
+        <div>
+            <div class="inline-flex items-center space-x-2 text-xs font-bold uppercase tracking-wider text-brand-400 mb-1">
+                <span>Direct From Warehouse</span>
+            </div>
+            <h2 class="text-3xl sm:text-4xl font-extrabold font-display text-white tracking-tight">Featured Hardware & Gear</h2>
+            <p class="text-sm text-slate-400 mt-1.5">Add products directly to your bag and proceed to our streamlined checkout.</p>
+        </div>
+        <div class="mt-4 sm:mt-0 flex items-center space-x-3">
+            <a href="/shop" class="text-xs font-semibold px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-200 border border-slate-800 hover:border-slate-700 transition-all flex items-center space-x-1.5">
+                <span>View Full Catalog</span>
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+            </a>
+        </div>
+    </div>
+
+    <!-- Products Grid -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        {% for product in products %}
+        <div class="group bg-slate-900/80 rounded-3xl border border-slate-800 hover:border-brand-500/50 transition-all duration-300 overflow-hidden flex flex-col shadow-xl hover:shadow-2xl hover:shadow-brand-500/10">
+            <!-- Image & Badges -->
+            <div class="relative aspect-square bg-slate-950 overflow-hidden">
+                <a href="/product/{{ product.slug }}" class="block w-full h-full">
+                    <img src="{{ product.images[0]|default('https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=600&q=80') }}" 
+                         alt="{{ product.title }}" 
+                         class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                </a>
+                
+                {% if product.sale_price %}
+                <span class="absolute top-3 left-3 px-2.5 py-1 rounded-full bg-rose-500 text-white text-[10px] font-extrabold uppercase tracking-wider shadow-lg">
+                    Sale
+                </span>
+                {% endif %}
+
+                <span class="absolute top-3 right-3 px-2 py-0.5 rounded-lg bg-slate-950/80 backdrop-blur-md text-amber-400 text-[10px] font-bold flex items-center space-x-1 border border-slate-800">
+                    <span>★</span>
+                    <span>4.9</span>
+                </span>
+            </div>
+
+            <!-- Details & Actions -->
+            <div class="p-5 flex-1 flex flex-col justify-between space-y-4">
+                <div>
+                    <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">{{ product.meta.category|default('Hardware') }}</span>
+                    <h3 class="font-display font-bold text-white text-base mt-1 group-hover:text-brand-300 transition-colors line-clamp-1">
+                        <a href="/product/{{ product.slug }}">{{ product.title }}</a>
+                    </h3>
+                </div>
+
+                <div class="pt-3 border-t border-slate-800/80 flex items-center justify-between">
+                    <div>
+                        {% if product.sale_price %}
+                            <div class="flex items-baseline space-x-1.5">
+                                <span class="text-lg font-extrabold font-display text-white">${{ product.sale_price|number_format(2) }}</span>
+                                <span class="text-xs text-slate-500 line-through">${{ product.price|number_format(2) }}</span>
+                            </div>
+                        {% else %}
+                            <span class="text-lg font-extrabold font-display text-white">${{ product.price|number_format(2) }}</span>
+                        {% endif %}
+                    </div>
+
+                    <!-- Functional Add to Bag Button -->
+                    <button type="button" 
+                            onclick="window.CartManager.addItem({ id: {{ product.id }}, title: '{{ product.title|e('js') }}', price: {{ product.sale_price|default(product.price) }}, regular_price: {{ product.price }}, slug: '{{ product.slug }}', image: '{{ product.images[0]|default('https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=600&q=80')|e('js') }}', sku: '{{ product.sku|default('SKU-1')|e('js') }}' })" 
+                            class="px-3.5 py-2 rounded-xl bg-brand-600 hover:bg-brand-500 active:scale-95 text-white text-xs font-bold transition-all shadow-md shadow-brand-500/25 flex items-center space-x-1.5">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/></svg>
+                        <span>Add</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+        {% else %}
+        <div class="col-span-4 text-center py-16 text-slate-500">
+            No products available yet. Add products in the Admin Control Panel.
+        </div>
+        {% endfor %}
+    </div>
+</section>
+
+<!-- Journal & Articles Section -->
+<section id="articles" class="bg-slate-900/30 border-t border-slate-800/80 py-20">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center max-w-2xl mx-auto mb-16">
+            <span class="text-xs font-bold uppercase tracking-wider text-brand-400">From the Editorial Team</span>
+            <h2 class="text-3xl font-bold font-display text-white mt-1">Latest Insights & Stories</h2>
+            <p class="text-sm text-slate-400 mt-2">Articles powered by our extensible hook and filter engine.</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {% for post in posts %}
+            <article class="group bg-slate-900/60 rounded-3xl border border-slate-800 hover:border-slate-700 transition-all overflow-hidden flex flex-col shadow-lg">
+                <div class="relative aspect-video bg-slate-950 overflow-hidden">
+                    <img src="{{ post.featured_image|default('https://images.unsplash.com/photo-1519389950473-47ba0277781c?auto=format&fit=crop&w=800&q=80') }}" 
+                         alt="{{ post.title }}" 
+                         class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                </div>
+                <div class="p-6 flex-1 flex flex-col justify-between">
+                    <div>
+                        <span class="text-xs text-brand-400 font-semibold">{{ post.published_at ? post.published_at|date('M d, Y') : 'Recent' }}</span>
+                        <h3 class="font-display font-bold text-xl text-white mt-2 group-hover:text-brand-300 transition-colors">
+                            <a href="/blog/{{ post.slug }}">{{ post.title }}</a>
+                        </h3>
+                        <p class="text-sm text-slate-400 mt-2 line-clamp-3 leading-relaxed">
+                            {{ post.excerpt|default('Read more about this story...') }}
+                        </p>
+                    </div>
+                    <div class="mt-6 pt-4 border-t border-slate-800/80 flex items-center justify-between text-xs text-slate-400">
+                        <span>Modern Editorial</span>
+                        <a href="/blog/{{ post.slug }}" class="font-semibold text-brand-400 hover:text-brand-300 flex items-center space-x-1">
+                            <span>Read article</span>
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                        </a>
+                    </div>
+                </div>
+            </article>
+            {% else %}
+            <div class="col-span-3 text-center py-12 text-slate-500">
+                No blog posts published yet.
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endblock %}

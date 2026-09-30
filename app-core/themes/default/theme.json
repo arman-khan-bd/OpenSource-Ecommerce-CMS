@@ -1,0 +1,16 @@
+{
+  "name": "Modern Canvas",
+  "slug": "default",
+  "version": "1.2.0",
+  "author": "Modern CMS Studio",
+  "description": "High-converting, sleek hybrid magazine and e-commerce storefront with dark/light aesthetics and seamless micro-interactions.",
+  "screenshot": "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=800&q=80",
+  "customizer": {
+    "accent_color": "#6366f1",
+    "announcement_bar": "Free express worldwide delivery on all orders over $75 | Code: FREESHIP",
+    "hero_badge": "Next-Gen Commerce & Publishing",
+    "hero_title": "Crafted for speed, designed for visionaries.",
+    "hero_subtitle": "Experience the harmony of a monolithic backend with modern headless flexibility.",
+    "footer_tagline": "Built with Symfony 7, Vue 3, and Server-Driven UI."
+  }
+}

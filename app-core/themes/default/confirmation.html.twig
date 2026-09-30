@@ -1,0 +1,125 @@
+{% extends "@theme/layout.html.twig" %}
+
+{% block title %}Order Confirmed — {{ order.order_number }} — {{ site.title }}{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+    <!-- Success Celebration Banner -->
+    <div class="text-center space-y-4 mb-12">
+        <div class="w-20 h-20 rounded-full bg-emerald-500/10 border-2 border-emerald-500/40 text-emerald-400 flex items-center justify-center mx-auto shadow-2xl shadow-emerald-500/20">
+            <svg class="w-10 h-10 animate-bounce" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+        </div>
+        <span class="inline-block px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-bold uppercase tracking-wider">
+            Order Confirmed & Received
+        </span>
+        <h1 class="text-3xl sm:text-4xl font-extrabold font-display text-white tracking-tight">
+            Thank you, {{ order.customer_name }}!
+        </h1>
+        <p class="text-slate-400 text-sm max-w-lg mx-auto">
+            Your order <strong class="text-white font-mono bg-slate-800 px-2 py-0.5 rounded">{{ order.order_number }}</strong> has been registered into the SQLite database and is currently <span class="capitalize text-indigo-400 font-semibold">{{ order.status }}</span>. A confirmation has been logged for <span class="text-slate-300 font-medium">{{ order.customer_email }}</span>.
+        </p>
+    </div>
+
+    <!-- Order Timeline Visual -->
+    <div class="p-6 rounded-3xl bg-slate-900/60 border border-slate-800 mb-10">
+        <div class="grid grid-cols-4 gap-2 text-center text-xs">
+            <div class="flex flex-col items-center space-y-2 text-emerald-400">
+                <div class="w-8 h-8 rounded-full bg-emerald-500 text-slate-950 font-bold flex items-center justify-center shadow-lg shadow-emerald-500/30">✓</div>
+                <span class="font-bold">Placed</span>
+            </div>
+            <div class="flex flex-col items-center space-y-2 text-brand-400">
+                <div class="w-8 h-8 rounded-full bg-brand-600 text-white font-bold flex items-center justify-center animate-pulse">2</div>
+                <span class="font-bold">Processing</span>
+            </div>
+            <div class="flex flex-col items-center space-y-2 text-slate-500">
+                <div class="w-8 h-8 rounded-full bg-slate-800 text-slate-400 font-bold flex items-center justify-center">3</div>
+                <span>Dispatched</span>
+            </div>
+            <div class="flex flex-col items-center space-y-2 text-slate-500">
+                <div class="w-8 h-8 rounded-full bg-slate-800 text-slate-400 font-bold flex items-center justify-center">4</div>
+                <span>Delivered</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Receipt Card -->
+    <div class="p-6 sm:p-10 rounded-3xl bg-slate-900/80 border border-slate-800 shadow-2xl backdrop-blur-xl space-y-8">
+        <!-- Order Meta Row -->
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 pb-6 border-b border-slate-800 text-xs">
+            <div>
+                <span class="text-slate-500 block">Order Number</span>
+                <span class="font-bold text-white font-mono text-sm">{{ order.order_number }}</span>
+            </div>
+            <div>
+                <span class="text-slate-500 block">Date Placed</span>
+                <span class="font-medium text-slate-200">{{ order.created_at|default("now"|date("Y-m-d H:i")) }}</span>
+            </div>
+            <div>
+                <span class="text-slate-500 block">Payment Method</span>
+                <span class="font-medium text-slate-200 uppercase">{{ order.shipping_address.payment_method|default('Credit Card') }}</span>
+            </div>
+            <div>
+                <span class="text-slate-500 block">Total Amount</span>
+                <span class="font-extrabold text-brand-300 font-display text-base">${{ order.total_amount|number_format(2) }}</span>
+            </div>
+        </div>
+
+        <!-- Ordered Items List -->
+        <div>
+            <h3 class="text-sm font-bold text-white uppercase tracking-wider mb-4 font-display">Items Purchased</h3>
+            <div class="divide-y divide-slate-800">
+                {% for item in order.items %}
+                <div class="py-4 flex items-center justify-between space-x-4">
+                    <div class="flex items-center space-x-3.5">
+                        <img src="{{ item.image|default('https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=100&q=80') }}" 
+                             alt="{{ item.title }}" 
+                             class="w-14 h-14 rounded-2xl object-cover bg-slate-950 border border-slate-800 shrink-0" />
+                        <div>
+                            <h4 class="text-sm font-bold text-white">{{ item.title }}</h4>
+                            <p class="text-xs text-slate-400 mt-0.5">Quantity: <span class="font-semibold text-slate-200">{{ item.quantity|default(1) }}</span> × ${{ item.price|number_format(2) }}</p>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <span class="text-sm font-bold text-white font-display">${{ (item.price * (item.quantity|default(1)))|number_format(2) }}</span>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Shipping & Delivery Address -->
+        <div class="pt-6 border-t border-slate-800 grid grid-cols-1 sm:grid-cols-2 gap-6 text-xs text-slate-400">
+            <div>
+                <h4 class="font-bold text-white uppercase tracking-wider mb-2">Shipping Address</h4>
+                <p class="text-slate-300 font-medium leading-relaxed">
+                    {{ order.customer_name }}<br>
+                    {{ order.shipping_address.street|default('') }}<br>
+                    {{ order.shipping_address.city|default('') }}, {{ order.shipping_address.state|default('') }} {{ order.shipping_address.postal_code|default('') }}<br>
+                    {{ order.shipping_address.country|default('United States') }}<br>
+                    {% if order.shipping_address.phone is defined and order.shipping_address.phone %}Phone: {{ order.shipping_address.phone }}{% endif %}
+                </p>
+            </div>
+            <div>
+                <h4 class="font-bold text-white uppercase tracking-wider mb-2">Order Notes</h4>
+                <p class="text-slate-300 italic leading-relaxed">
+                    {{ order.notes|default('No special instructions provided.') }}
+                </p>
+            </div>
+        </div>
+
+        <!-- Action Links -->
+        <div class="pt-8 border-t border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <button onclick="window.print()" class="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold flex items-center justify-center space-x-2 transition-all">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>
+                <span>Print Order Receipt</span>
+            </button>
+            <div class="flex items-center space-x-3 w-full sm:w-auto">
+                <a href="/shop" class="w-full sm:w-auto px-6 py-2.5 rounded-xl bg-brand-600 hover:bg-brand-500 text-white text-xs font-bold flex items-center justify-center space-x-1.5 shadow-lg shadow-brand-500/25 transition-all">
+                    <span>Continue Shopping</span>
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

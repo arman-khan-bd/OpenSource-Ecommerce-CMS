@@ -1,0 +1,26 @@
+{
+  "name": "opensource-ecommerce-cms-frontend",
+  "description": "OpenSource eCommerce CMS — Alternative to WordPress frontend admin and installer SPA",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build"
+  },
+  "dependencies": {
+    "@inertiajs/vue3": "^3.7.1",
+    "@lucide/vue": "^1.49.0",
+    "@vueuse/core": "^11.0.0",
+    "@vueuse/motion": "^3.0.3",
+    "lucide-vue-next": "^0.454.0",
+    "vue": "^3.5.0"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^5.1.4",
+    "autoprefixer": "^10.4.20",
+    "postcss": "^8.4.47",
+    "tailwindcss": "^3.4.14",
+    "vite": "^5.4.10"
+  }
+}

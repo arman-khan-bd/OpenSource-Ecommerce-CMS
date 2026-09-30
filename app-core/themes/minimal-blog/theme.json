@@ -1,0 +1,12 @@
+{
+  "name": "Minimal Editorial",
+  "slug": "minimal-blog",
+  "version": "1.0.0",
+  "author": "Typography Works",
+  "description": "An ultra-clean, distraction-free editorial theme focused on typography, reading comfort, and rapid page loads.",
+  "screenshot": "https://images.unsplash.com/photo-1499750310107-5fef28a66643?auto=format&fit=crop&w=800&q=80",
+  "customizer": {
+    "font_family": "serif",
+    "reading_width": "max-w-2xl"
+  }
+}

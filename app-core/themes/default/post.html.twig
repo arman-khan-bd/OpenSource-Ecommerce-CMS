@@ -1,0 +1,46 @@
+{% extends "@theme/layout.html.twig" %}
+
+{% block title %}{{ post.title }} — {{ site.title }}{% endblock %}
+
+{% block content %}
+<article class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+    <div class="space-y-4 text-center mb-10">
+        <div class="inline-flex items-center space-x-2 text-xs font-semibold uppercase tracking-wider text-brand-400">
+            <span>Editorial Article</span>
+            <span>•</span>
+            <span>{{ post.published_at ? post.published_at|date('F j, Y') : 'Published' }}</span>
+        </div>
+        <h1 class="text-3xl sm:text-5xl font-extrabold font-display text-white tracking-tight leading-tight">
+            {{ post.title }}
+        </h1>
+        {% if post.excerpt %}
+        <p class="text-lg text-slate-400 max-w-2xl mx-auto leading-relaxed">
+            {{ post.excerpt }}
+        </p>
+        {% endif %}
+    </div>
+
+    {% if post.featured_image %}
+    <div class="aspect-video w-full rounded-2xl overflow-hidden bg-slate-900 border border-slate-800 shadow-2xl mb-12">
+        <img src="{{ post.featured_image }}" alt="{{ post.title }}" class="w-full h-full object-cover">
+    </div>
+    {% endif %}
+
+    <div class="prose prose-invert prose-indigo max-w-none text-slate-300 text-base leading-relaxed space-y-6">
+        {{ post.content|raw }}
+    </div>
+
+    <div class="mt-16 pt-8 border-t border-slate-800 flex items-center justify-between">
+        <a href="/" class="text-sm font-semibold text-brand-400 hover:text-brand-300 flex items-center space-x-2">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+            <span>Back to Stories</span>
+        </a>
+        <div class="flex items-center space-x-2">
+            <span class="text-xs text-slate-500">Share Story:</span>
+            <button onclick="navigator.clipboard.writeText(window.location.href); alert('Link copied to clipboard!');" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs font-medium text-slate-300 transition-colors">
+                Copy Link
+            </button>
+        </div>
+    </div>
+</article>
+{% endblock %}

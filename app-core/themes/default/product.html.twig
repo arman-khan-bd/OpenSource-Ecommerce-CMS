@@ -1,0 +1,77 @@
+{% extends "@theme/layout.html.twig" %}
+
+{% block title %}{{ product.title }} — {{ site.title }}{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16">
+        <!-- Media Gallery -->
+        <div class="space-y-4">
+            <div class="aspect-square w-full rounded-2xl overflow-hidden bg-slate-900 border border-slate-800 shadow-xl">
+                <img src="{{ product.images[0]|default('https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=800&q=80') }}" 
+                     alt="{{ product.title }}" 
+                     class="w-full h-full object-cover">
+            </div>
+        </div>
+
+        <!-- Product Information -->
+        <div class="flex flex-col justify-between space-y-8">
+            <div class="space-y-4">
+                <div class="flex items-center space-x-3">
+                    <span class="text-xs font-bold uppercase tracking-wider text-brand-400">
+                        {{ product.meta.category|default('Hardware') }}
+                    </span>
+                    <span class="text-slate-600">•</span>
+                    <span class="text-xs text-slate-400 font-mono">SKU: {{ product.sku|default('GEN-01') }}</span>
+                    {% if product.stock > 0 %}
+                    <span class="px-2.5 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-[11px] font-semibold">
+                        In Stock ({{ product.stock }})
+                    </span>
+                    {% else %}
+                    <span class="px-2.5 py-0.5 rounded-full bg-rose-500/10 border border-rose-500/20 text-rose-400 text-[11px] font-semibold">
+                        Out of Stock
+                    </span>
+                    {% endif %}
+                </div>
+
+                <h1 class="text-3xl sm:text-4xl font-extrabold font-display text-white tracking-tight">
+                    {{ product.title }}
+                </h1>
+
+                <div class="flex items-baseline space-x-3">
+                    {% if product.sale_price %}
+                        <span class="text-3xl font-extrabold font-display text-white">${{ product.sale_price|number_format(2) }}</span>
+                        <span class="text-lg text-slate-500 line-through">${{ product.price|number_format(2) }}</span>
+                        <span class="px-2 py-0.5 rounded bg-rose-500/20 text-rose-400 text-xs font-bold">SAVE ${{ (product.price - product.sale_price)|number_format(2) }}</span>
+                    {% else %}
+                        <span class="text-3xl font-extrabold font-display text-white">${{ product.price|number_format(2) }}</span>
+                    {% endif %}
+                </div>
+
+                <div class="text-sm text-slate-300 leading-relaxed pt-4 border-t border-slate-800">
+                    <p>{{ product.description|default('Premium engineering designed for high reliability and exceptional performance.') }}</p>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="space-y-4 pt-6 border-t border-slate-800">
+                <button onclick="window.CartManager.addItem({ id: {{ product.id }}, title: '{{ product.title|e('js') }}', price: {{ product.sale_price|default(product.price) }}, regular_price: {{ product.price }}, slug: '{{ product.slug }}', image: '{{ product.images[0]|default('https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=800&q=80')|e('js') }}', sku: '{{ product.sku|default('SKU-1')|e('js') }}' }); window.CartManager.openDrawer();" class="w-full py-4 rounded-xl bg-gradient-to-r from-brand-600 via-indigo-600 to-purple-600 hover:from-brand-500 hover:to-indigo-500 text-white font-bold shadow-xl shadow-brand-500/30 transition-all flex items-center justify-center space-x-2 text-base active:scale-98">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/></svg>
+                    <span>Add to Bag & Checkout</span>
+                </button>
+
+                <div class="flex items-center justify-between text-xs text-slate-400 px-2">
+                    <span class="flex items-center space-x-1">
+                        <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                        <span>Complimentary Express Shipping</span>
+                    </span>
+                    <span class="flex items-center space-x-1">
+                        <svg class="w-4 h-4 text-brand-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+                        <span>2-Year Manufacturer Warranty</span>
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

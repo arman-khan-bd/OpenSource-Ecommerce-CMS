@@ -1,0 +1,426 @@
+{% extends "@theme/layout.html.twig" %}
+
+{% block title %}Checkout — {{ site.title }}{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-16">
+    <!-- Breadcrumb -->
+    <div class="flex items-center space-x-2 text-xs text-slate-400 mb-8">
+        <a href="/" class="hover:text-white transition-colors">Home</a>
+        <span>/</span>
+        <a href="/shop" class="hover:text-white transition-colors">Shop</a>
+        <span>/</span>
+        <span class="text-brand-400 font-semibold">Secure Checkout</span>
+    </div>
+
+    <!-- Empty Bag Warning (hidden if items present) -->
+    <div id="checkout-empty-state" class="hidden text-center py-20 p-8 rounded-3xl bg-slate-900/60 border border-slate-800">
+        <div class="w-20 h-20 rounded-3xl bg-slate-800/80 border border-slate-700/60 flex items-center justify-center text-slate-400 mx-auto mb-4">
+            <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/></svg>
+        </div>
+        <h2 class="text-2xl font-bold font-display text-white">Your Shopping Bag is Empty</h2>
+        <p class="text-sm text-slate-400 mt-2 max-w-md mx-auto">You don't have any items in your bag yet. Explore our store to add products before checking out.</p>
+        <a href="/shop" class="inline-flex items-center space-x-2 mt-6 px-6 py-3 rounded-xl bg-brand-600 hover:bg-brand-500 text-white font-bold text-sm shadow-xl shadow-brand-500/25 transition-all">
+            <span>Browse Products</span>
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+        </a>
+    </div>
+
+    <!-- Checkout Main Grid -->
+    <div id="checkout-main-grid" class="grid grid-cols-1 lg:grid-cols-12 gap-10">
+        <!-- Left: Customer & Shipping Details Form -->
+        <div class="lg:col-span-7 space-y-8">
+            <form id="checkout-form" onsubmit="submitCheckout(event)" class="space-y-8">
+                <!-- Customer Details -->
+                <div class="p-6 sm:p-8 rounded-3xl bg-slate-900/70 border border-slate-800 shadow-xl backdrop-blur-md space-y-5">
+                    <div class="flex items-center space-x-3">
+                        <span class="w-7 h-7 rounded-lg bg-brand-500/20 text-brand-400 font-bold text-xs flex items-center justify-center">1</span>
+                        <h2 class="text-lg font-bold text-white font-display">Customer Information</h2>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
+                        <div class="sm:col-span-2">
+                            <label class="block font-semibold text-slate-300 mb-1.5">Full Name *</label>
+                            <input type="text" name="customer_name" required placeholder="John Doe"
+                                   class="w-full px-4 py-3 rounded-xl bg-slate-950/80 border border-slate-800 text-white focus:outline-none focus:border-brand-500 transition-colors" />
+                        </div>
+                        <div>
+                            <label class="block font-semibold text-slate-300 mb-1.5">Email Address *</label>
+                            <input type="email" name="customer_email" required placeholder="john@example.com"
+                                   class="w-full px-4 py-3 rounded-xl bg-slate-950/80 border border-slate-800 text-white focus:outline-none focus:border-brand-500 transition-colors" />
+                        </div>
+                        <div>
+                            <label class="block font-semibold text-slate-300 mb-1.5">Phone Number</label>
+                            <input type="tel" name="phone" placeholder="+1 (555) 019-2834"
+                                   class="w-full px-4 py-3 rounded-xl bg-slate-950/80 border border-slate-800 text-white focus:outline-none focus:border-brand-500 transition-colors" />
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Shipping Address -->
+                <div class="p-6 sm:p-8 rounded-3xl bg-slate-900/70 border border-slate-800 shadow-xl backdrop-blur-md space-y-5">
+                    <div class="flex items-center space-x-3">
+                        <span class="w-7 h-7 rounded-lg bg-brand-500/20 text-brand-400 font-bold text-xs flex items-center justify-center">2</span>
+                        <h2 class="text-lg font-bold text-white font-display">Shipping Destination</h2>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
+                        <div class="sm:col-span-2">
+                            <label class="block font-semibold text-slate-300 mb-1.5">Street Address *</label>
+                            <input type="text" name="street" required placeholder="123 Innovation Blvd, Suite 400"
+                                   class="w-full px-4 py-3 rounded-xl bg-slate-950/80 border border-slate-800 text-white focus:outline-none focus:border-brand-500 transition-colors" />
+                        </div>
+                        <div>
+                            <label class="block font-semibold text-slate-300 mb-1.5">City *</label>
+                            <input type="text" name="city" required placeholder="San Francisco"
+                                   class="w-full px-4 py-3 rounded-xl bg-slate-950/80 border border-slate-800 text-white focus:outline-none focus:border-brand-500 transition-colors" />
+                        </div>
+                        <div>
+                            <label class="block font-semibold text-slate-300 mb-1.5">State / Province</label>
+                            <input type="text" name="state" placeholder="California"
+                                   class="w-full px-4 py-3 rounded-xl bg-slate-950/80 border border-slate-800 text-white focus:outline-none focus:border-brand-500 transition-colors" />
+                        </div>
+                        <div>
+                            <label class="block font-semibold text-slate-300 mb-1.5">Postal / ZIP Code *</label>
+                            <input type="text" name="postal_code" required placeholder="94107"
+                                   class="w-full px-4 py-3 rounded-xl bg-slate-950/80 border border-slate-800 text-white focus:outline-none focus:border-brand-500 transition-colors" />
+                        </div>
+                        <div>
+                            <label class="block font-semibold text-slate-300 mb-1.5">Country *</label>
+                            <select name="country" class="w-full px-4 py-3 rounded-xl bg-slate-950/80 border border-slate-800 text-white focus:outline-none focus:border-brand-500 transition-colors">
+                                <option value="United States">United States</option>
+                                <option value="Canada">Canada</option>
+                                <option value="United Kingdom">United Kingdom</option>
+                                <option value="Germany">Germany</option>
+                                <option value="Australia">Australia</option>
+                                <option value="France">France</option>
+                                <option value="Japan">Japan</option>
+                                <option value="Global">Other International</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Payment Method -->
+                <div class="p-6 sm:p-8 rounded-3xl bg-slate-900/70 border border-slate-800 shadow-xl backdrop-blur-md space-y-5">
+                    <div class="flex items-center space-x-3">
+                        <span class="w-7 h-7 rounded-lg bg-brand-500/20 text-brand-400 font-bold text-xs flex items-center justify-center">3</span>
+                        <h2 class="text-lg font-bold text-white font-display">Payment Method</h2>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
+                        <label class="payment-method-card p-3.5 rounded-2xl border border-brand-500 bg-brand-950/40 text-white flex flex-col items-center justify-center cursor-pointer transition-all space-y-2">
+                            <input type="radio" name="payment_method" value="card" checked class="hidden" onchange="updatePaymentUI(this.value)" />
+                            <svg class="w-6 h-6 text-brand-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/></svg>
+                            <span class="font-bold">Credit Card</span>
+                        </label>
+                        <label class="payment-method-card p-3.5 rounded-2xl border border-slate-800 bg-slate-950/50 text-slate-300 hover:border-slate-700 flex flex-col items-center justify-center cursor-pointer transition-all space-y-2">
+                            <input type="radio" name="payment_method" value="cod" class="hidden" onchange="updatePaymentUI(this.value)" />
+                            <svg class="w-6 h-6 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+                            <span class="font-bold">Cash on Delivery</span>
+                        </label>
+                        <label class="payment-method-card p-3.5 rounded-2xl border border-slate-800 bg-slate-950/50 text-slate-300 hover:border-slate-700 flex flex-col items-center justify-center cursor-pointer transition-all space-y-2">
+                            <input type="radio" name="payment_method" value="paypal" class="hidden" onchange="updatePaymentUI(this.value)" />
+                            <svg class="w-6 h-6 text-sky-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                            <span class="font-bold">Digital / PayPal</span>
+                        </label>
+                    </div>
+
+                    <!-- Card Fields (shown when card is selected) -->
+                    <div id="card-fields" class="space-y-3 pt-2 text-xs">
+                        <div>
+                            <label class="block font-semibold text-slate-300 mb-1.5">Card Number</label>
+                            <div class="relative">
+                                <input type="text" placeholder="4532 •••• •••• 8912" maxlength="19"
+                                       class="w-full px-4 py-3 rounded-xl bg-slate-950/80 border border-slate-800 text-white focus:outline-none focus:border-brand-500 font-mono" />
+                                <div class="absolute right-3.5 top-1/2 -translate-y-1/2 flex space-x-1.5 text-slate-400 text-[10px] font-bold">
+                                    <span>VISA</span>
+                                    <span>MC</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label class="block font-semibold text-slate-300 mb-1.5">Expiry Date</label>
+                                <input type="text" placeholder="MM / YY" maxlength="5"
+                                       class="w-full px-4 py-3 rounded-xl bg-slate-950/80 border border-slate-800 text-white focus:outline-none focus:border-brand-500 font-mono" />
+                            </div>
+                            <div>
+                                <label class="block font-semibold text-slate-300 mb-1.5">CVV / CVC</label>
+                                <input type="password" placeholder="•••" maxlength="4"
+                                       class="w-full px-4 py-3 rounded-xl bg-slate-950/80 border border-slate-800 text-white focus:outline-none focus:border-brand-500 font-mono" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Order Notes -->
+                <div class="p-6 rounded-3xl bg-slate-900/50 border border-slate-800 text-xs">
+                    <label class="block font-semibold text-slate-300 mb-1.5">Delivery Notes / Special Instructions</label>
+                    <textarea name="notes" rows="2" placeholder="e.g. Leave with doorman, gate code #1234"
+                              class="w-full px-4 py-2.5 rounded-xl bg-slate-950/80 border border-slate-800 text-white focus:outline-none focus:border-brand-500 transition-colors"></textarea>
+                </div>
+
+                <!-- Error Box -->
+                <div id="checkout-error" class="hidden p-4 rounded-2xl bg-rose-950/80 border border-rose-500/40 text-rose-200 text-xs flex items-center space-x-2">
+                    <svg class="w-4 h-4 text-rose-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                    <span id="checkout-error-text">An error occurred. Please check your information.</span>
+                </div>
+
+                <!-- Submit Button -->
+                <button type="submit" id="submit-order-btn"
+                        class="w-full py-4 rounded-2xl bg-gradient-to-r from-brand-600 via-indigo-600 to-purple-600 hover:from-brand-500 hover:to-indigo-500 text-white font-extrabold text-base shadow-2xl shadow-brand-500/30 transition-all flex items-center justify-center space-x-2">
+                    <span id="btn-text">Place Order (<span id="btn-total">$0.00</span>)</span>
+                    <svg id="btn-icon" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                    <svg id="btn-spinner" class="w-5 h-5 animate-spin hidden" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path></svg>
+                </button>
+            </form>
+        </div>
+
+        <!-- Right: Sticky Order Summary & Items List -->
+        <div class="lg:col-span-5">
+            <div class="sticky top-28 space-y-6">
+                <!-- Summary Card -->
+                <div class="p-6 sm:p-8 rounded-3xl bg-slate-900/90 border border-slate-800 shadow-2xl backdrop-blur-xl space-y-6">
+                    <div class="flex items-center justify-between pb-4 border-b border-slate-800">
+                        <h3 class="font-bold text-white text-lg font-display">Order Summary</h3>
+                        <span id="summary-items-count" class="text-xs text-brand-400 font-semibold">0 items</span>
+                    </div>
+
+                    <!-- Items List -->
+                    <div id="checkout-items-list" class="max-h-80 overflow-y-auto space-y-3.5 pr-1">
+                        <!-- Populated by JS -->
+                    </div>
+
+                    <!-- Promo Code Box -->
+                    <div class="pt-4 border-t border-slate-800">
+                        <div class="flex space-x-2">
+                            <input type="text" id="coupon-input" placeholder="Coupon Code (try APEX20)"
+                                   class="flex-1 px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-xs text-white uppercase placeholder-slate-500 focus:outline-none focus:border-brand-500" />
+                            <button type="button" onclick="applyCoupon()" class="px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-bold text-white transition-colors">
+                                Apply
+                            </button>
+                        </div>
+                        <p id="coupon-message" class="text-[11px] mt-1.5 hidden"></p>
+                    </div>
+
+                    <!-- Price Calculations -->
+                    <div class="space-y-2.5 text-xs text-slate-400 pt-4 border-t border-slate-800">
+                        <div class="flex justify-between">
+                            <span>Bag Subtotal</span>
+                            <span id="summary-subtotal" class="font-bold text-white text-sm font-display">$0.00</span>
+                        </div>
+                        <div id="discount-row" class="flex justify-between text-emerald-400 hidden">
+                            <span>Discount Applied</span>
+                            <span id="summary-discount" class="font-bold">-$0.00</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span>Shipping</span>
+                            <span id="summary-shipping" class="text-slate-300 font-medium">$15.00</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span>Estimated Tax (5%)</span>
+                            <span id="summary-tax" class="text-slate-300">$0.00</span>
+                        </div>
+                        <div class="flex justify-between pt-3 border-t border-slate-800 text-base font-extrabold text-white">
+                            <span>Total Due</span>
+                            <span id="summary-total" class="text-xl text-brand-300 font-display">$0.00</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Trust Guarantee Box -->
+                <div class="p-4 rounded-2xl bg-slate-900/40 border border-slate-800/80 grid grid-cols-3 gap-2 text-center text-[10px] text-slate-400">
+                    <div class="p-2">
+                        <span class="block text-base mb-1">🔒</span>
+                        <span class="font-semibold text-slate-300 block">256-Bit SSL</span>
+                        <span>Secure Checkout</span>
+                    </div>
+                    <div class="p-2">
+                        <span class="block text-base mb-1">⚡</span>
+                        <span class="font-semibold text-slate-300 block">Instant Order</span>
+                        <span>Direct Fulfillment</span>
+                    </div>
+                    <div class="p-2">
+                        <span class="block text-base mb-1">🛡️</span>
+                        <span class="font-semibold text-slate-300 block">30-Day Return</span>
+                        <span>Money-Back Guarantee</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+let discountPercentage = 0;
+
+function updatePaymentUI(method) {
+    document.querySelectorAll('.payment-method-card').forEach(el => {
+        el.classList.remove('border-brand-500', 'bg-brand-950/40', 'text-white');
+        el.classList.add('border-slate-800', 'bg-slate-950/50', 'text-slate-300');
+    });
+    const selected = document.querySelector(`input[name="payment_method"][value="${method}"]`);
+    if (selected) {
+        const card = selected.closest('.payment-method-card');
+        card.classList.remove('border-slate-800', 'bg-slate-950/50', 'text-slate-300');
+        card.classList.add('border-brand-500', 'bg-brand-950/40', 'text-white');
+    }
+    const cardFields = document.getElementById('card-fields');
+    if (cardFields) {
+        cardFields.style.display = method === 'card' ? 'block' : 'none';
+    }
+}
+
+function applyCoupon() {
+    const input = document.getElementById('coupon-input');
+    const msg = document.getElementById('coupon-message');
+    const code = (input.value || '').trim().toUpperCase();
+
+    if (code === 'APEX20') {
+        discountPercentage = 0.20;
+        msg.textContent = '✓ 20% Discount Applied via APEX20!';
+        msg.className = 'text-[11px] mt-1.5 text-emerald-400 font-semibold';
+        msg.classList.remove('hidden');
+    } else if (code === 'WELCOME10') {
+        discountPercentage = 0.10;
+        msg.textContent = '✓ 10% Discount Applied via WELCOME10!';
+        msg.className = 'text-[11px] mt-1.5 text-emerald-400 font-semibold';
+        msg.classList.remove('hidden');
+    } else {
+        discountPercentage = 0;
+        msg.textContent = 'Invalid promo code. Try APEX20 or WELCOME10.';
+        msg.className = 'text-[11px] mt-1.5 text-rose-400 font-semibold';
+        msg.classList.remove('hidden');
+    }
+    renderCheckoutSummary();
+}
+
+function renderCheckoutSummary() {
+    const items = window.CartManager ? window.CartManager.getItems() : [];
+    const emptyState = document.getElementById('checkout-empty-state');
+    const mainGrid = document.getElementById('checkout-main-grid');
+
+    if (items.length === 0) {
+        if (emptyState) emptyState.classList.remove('hidden');
+        if (mainGrid) mainGrid.classList.add('hidden');
+        return;
+    } else {
+        if (emptyState) emptyState.classList.add('hidden');
+        if (mainGrid) mainGrid.classList.remove('hidden');
+    }
+
+    const subtotal = items.reduce((sum, i) => sum + (parseFloat(i.price) * (i.quantity || 1)), 0);
+    const discount = subtotal * discountPercentage;
+    const discountedSubtotal = subtotal - discount;
+    const shipping = discountedSubtotal >= 100 ? 0 : 15;
+    const tax = discountedSubtotal * 0.05;
+    const total = discountedSubtotal + shipping + tax;
+
+    // Populate Items
+    const container = document.getElementById('checkout-items-list');
+    if (container) {
+        container.innerHTML = items.map(item => `
+            <div class="flex items-center space-x-3 p-3 rounded-2xl bg-slate-950/60 border border-slate-800/80">
+                <img src="${item.image}" alt="${item.title}" class="w-12 h-12 rounded-xl object-cover border border-slate-800 shrink-0" />
+                <div class="flex-1 min-w-0">
+                    <h4 class="text-xs font-bold text-white truncate">${item.title}</h4>
+                    <p class="text-[11px] text-slate-400">Qty: ${item.quantity || 1} × $${parseFloat(item.price).toFixed(2)}</p>
+                </div>
+                <div class="text-right shrink-0">
+                    <span class="text-xs font-bold text-white font-display">$${(parseFloat(item.price) * (item.quantity || 1)).toFixed(2)}</span>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    document.getElementById('summary-items-count').textContent = `${items.reduce((s, i) => s + (i.quantity || 1), 0)} items`;
+    document.getElementById('summary-subtotal').textContent = `$${subtotal.toFixed(2)}`;
+    document.getElementById('summary-shipping').textContent = shipping === 0 ? 'FREE' : `$${shipping.toFixed(2)}`;
+    document.getElementById('summary-tax').textContent = `$${tax.toFixed(2)}`;
+    document.getElementById('summary-total').textContent = `$${total.toFixed(2)}`;
+    document.getElementById('btn-total').textContent = `$${total.toFixed(2)}`;
+
+    const discountRow = document.getElementById('discount-row');
+    const summaryDiscount = document.getElementById('summary-discount');
+    if (discountPercentage > 0) {
+        discountRow.classList.remove('hidden');
+        summaryDiscount.textContent = `-$${discount.toFixed(2)}`;
+    } else {
+        discountRow.classList.add('hidden');
+    }
+}
+
+async function submitCheckout(e) {
+    e.preventDefault();
+    const form = e.target;
+    const formData = new FormData(form);
+    const items = window.CartManager.getItems();
+
+    if (items.length === 0) {
+        alert('Your bag is empty.');
+        return;
+    }
+
+    const payload = {
+        customer_name: formData.get('customer_name'),
+        customer_email: formData.get('customer_email'),
+        phone: formData.get('phone'),
+        street: formData.get('street'),
+        city: formData.get('city'),
+        state: formData.get('state'),
+        postal_code: formData.get('postal_code'),
+        country: formData.get('country'),
+        payment_method: formData.get('payment_method'),
+        notes: formData.get('notes'),
+        items: items
+    };
+
+    const btn = document.getElementById('submit-order-btn');
+    const btnText = document.getElementById('btn-text');
+    const btnIcon = document.getElementById('btn-icon');
+    const btnSpinner = document.getElementById('btn-spinner');
+    const errorBox = document.getElementById('checkout-error');
+    const errorText = document.getElementById('checkout-error-text');
+
+    btn.disabled = true;
+    btnText.textContent = 'Processing Order...';
+    btnIcon.classList.add('hidden');
+    btnSpinner.classList.remove('hidden');
+    errorBox.classList.add('hidden');
+
+    try {
+        const res = await fetch('/api/v1/checkout', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+
+        if (data.success) {
+            window.CartManager.clear();
+            window.location.href = data.redirect || `/checkout/confirmation/${data.order_number}`;
+        } else {
+            errorText.textContent = data.message || 'Failed to place order. Please review your details.';
+            errorBox.classList.remove('hidden');
+            btn.disabled = false;
+            btnText.textContent = 'Place Order (' + document.getElementById('summary-total').textContent + ')';
+            btnIcon.classList.remove('hidden');
+            btnSpinner.classList.add('hidden');
+        }
+    } catch (err) {
+        errorText.textContent = 'Network or server error: ' + err.message;
+        errorBox.classList.remove('hidden');
+        btn.disabled = false;
+        btnText.textContent = 'Place Order (' + document.getElementById('summary-total').textContent + ')';
+        btnIcon.classList.remove('hidden');
+        btnSpinner.classList.add('hidden');
+    }
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    renderCheckoutSummary();
+    window.addEventListener('cart-changed', renderCheckoutSummary);
+});
+</script>
+{% endblock %}

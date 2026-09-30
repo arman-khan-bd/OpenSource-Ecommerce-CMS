@@ -1,0 +1,59 @@
+{% extends "@theme/layout.html.twig" %}
+
+{% block title %}Store — {{ site.title }}{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+    <div class="mb-12 text-center max-w-xl mx-auto">
+        <span class="text-xs font-bold uppercase tracking-wider text-brand-400">Full Catalog</span>
+        <h1 class="text-4xl font-extrabold font-display text-white mt-1">Shop All Products</h1>
+        <p class="text-sm text-slate-400 mt-2">Explore our collection of cutting-edge hardware and accessories.</p>
+    </div>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        {% for product in products %}
+        <div class="group bg-slate-900/80 rounded-2xl border border-slate-800 hover:border-brand-500/50 transition-all overflow-hidden flex flex-col shadow-lg">
+            <div class="relative aspect-square bg-slate-950 overflow-hidden">
+                <img src="{{ product.images[0]|default('https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=600&q=80') }}" 
+                     alt="{{ product.title }}" 
+                     class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                {% if product.sale_price %}
+                <span class="absolute top-3 right-3 px-2.5 py-1 rounded-full bg-rose-500 text-white text-[10px] font-bold uppercase tracking-wider shadow">
+                    Sale
+                </span>
+                {% endif %}
+            </div>
+            <div class="p-5 flex-1 flex flex-col justify-between">
+                <div>
+                    <span class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">{{ product.meta.category|default('Hardware') }}</span>
+                    <h3 class="font-display font-bold text-white text-base mt-1 group-hover:text-brand-300 transition-colors line-clamp-1">
+                        <a href="/product/{{ product.slug }}">{{ product.title }}</a>
+                    </h3>
+                </div>
+                <div class="mt-4 pt-4 border-t border-slate-800 flex items-center justify-between">
+                    <div>
+                        {% if product.sale_price %}
+                            <span class="text-lg font-bold font-display text-white">${{ product.sale_price|number_format(2) }}</span>
+                            <span class="text-xs text-slate-500 line-through ml-1.5">${{ product.price|number_format(2) }}</span>
+                        {% else %}
+                            <span class="text-lg font-bold font-display text-white">${{ product.price|number_format(2) }}</span>
+                        {% endif %}
+                    </div>
+                    <button type="button" 
+                            onclick="window.CartManager.addItem({ id: {{ product.id }}, title: '{{ product.title|e('js') }}', price: {{ product.sale_price|default(product.price) }}, regular_price: {{ product.price }}, slug: '{{ product.slug }}', image: '{{ product.images[0]|default('https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=600&q=80')|e('js') }}', sku: '{{ product.sku|default('SKU-1')|e('js') }}' })" 
+                            class="px-3.5 py-1.5 rounded-xl bg-brand-600 hover:bg-brand-500 active:scale-95 text-white text-xs font-bold transition-all shadow-md shadow-brand-500/25 flex items-center space-x-1.5"
+                            title="Add to shopping bag">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/></svg>
+                        <span>Add</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+        {% else %}
+        <div class="col-span-4 text-center py-16 text-slate-500">
+            No products available at the moment.
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

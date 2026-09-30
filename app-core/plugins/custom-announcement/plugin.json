@@ -1,0 +1,11 @@
+{
+  "name": "Live Promo Banner",
+  "slug": "custom-announcement",
+  "version": "1.0.0",
+  "author": "Marketing Team",
+  "description": "Hooks into storefront header and Android SDUI to inject promotional countdown alerts and discount codes.",
+  "settings": {
+    "promo_text": "VIP Summer Sale: 20% OFF all hardware with code APEX20",
+    "is_enabled": true
+  }
+}

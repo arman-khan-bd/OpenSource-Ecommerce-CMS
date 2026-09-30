@@ -1,0 +1,12 @@
+{
+  "name": "SEO & Social Toolkit",
+  "slug": "seo-toolkit",
+  "version": "1.0.0",
+  "author": "Apex Core Team",
+  "description": "Automatically generates OpenGraph metadata, Twitter Cards, robots indexing tags, and canonical URLs on storefront pages.",
+  "settings": {
+    "twitter_handle": "@apexmoderncms",
+    "enable_opengraph": true,
+    "enable_json_ld": true
+  }
+}

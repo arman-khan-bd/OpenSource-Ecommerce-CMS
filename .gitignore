@@ -1,0 +1,66 @@
+# ==========================================
+# Dependencies (Composer & Node)
+# ==========================================
+/app-core/vendor/
+vendor/
+/app-core/frontend/node_modules/
+node_modules/
+
+# ==========================================
+# Symfony Runtime, Caches & Logs
+# ==========================================
+/app-core/var/cache/
+/app-core/var/log/
+/app-core/var/sessions/
+/app-core/var/share/
+/app-core/var/app_cache/
+
+# ==========================================
+# Local Database & Installer Locks
+# ==========================================
+/app-core/var/*.sqlite
+/app-core/var/*.db
+/app-core/var/database.php
+/app-core/var/installed.lock
+
+# ==========================================
+# Local Environment Overrides
+# ==========================================
+/app-core/.env.local
+/app-core/.env.*.local
+/app-core/.env.local.php
+.env.local
+
+# ==========================================
+# Frontend Build Caches & Intermediates
+# ==========================================
+/app-core/frontend/dist/
+/public_html/build/.vite/
+.vite/
+
+# ==========================================
+# User Uploads
+# ==========================================
+/public_html/uploads/*
+!/public_html/uploads/.gitkeep
+
+# ==========================================
+# OS & IDE Files
+# ==========================================
+.DS_Store
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# ==========================================
+# Logs & Agent Cache
+# ==========================================
+*.log
+.system_generated/
+.gemini/
+.agents/

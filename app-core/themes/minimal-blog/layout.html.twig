@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{% block title %}{{ site.title|default('Minimal Journal') }}{% endblock %}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,600;1,6..72,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        serif: ['"Newsreader"', 'serif'],
+                        sans: ['"Inter"', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    {% if headInjected is defined %}{{ headInjected|raw }}{% endif %}
+</head>
+<body class="bg-[#faf9f6] text-[#222] font-serif antialiased min-h-screen flex flex-col selection:bg-black selection:text-white">
+    <header class="border-b border-neutral-200 py-8">
+        <div class="max-w-3xl mx-auto px-4 flex items-center justify-between font-sans">
+            <a href="/" class="text-xl font-bold tracking-tight text-neutral-900 font-serif">{{ site.title|default('Minimal') }}</a>
+            <nav class="flex items-center space-x-6 text-xs uppercase tracking-wider text-neutral-600 font-medium">
+                <a href="/" class="hover:text-black">Journal</a>
+                <a href="/shop" class="hover:text-black">Store</a>
+                <a href="/admin" class="hover:text-black">Admin</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="flex-grow max-w-3xl mx-auto px-4 py-12 w-full">
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer class="border-t border-neutral-200 py-8 text-center text-xs text-neutral-400 font-sans">
+        <p>&copy; {{ "now"|date("Y") }} {{ site.title }}. Minimalist Editorial Theme.</p>
+    </footer>
+    {% if footerInjected is defined %}{{ footerInjected|raw }}{% endif %}
+</body>
+</html>

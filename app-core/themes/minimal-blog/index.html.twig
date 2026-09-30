@@ -1,0 +1,29 @@
+{% extends "@theme/layout.html.twig" %}
+
+{% block content %}
+<div class="space-y-16">
+    <div class="border-b border-neutral-200 pb-8">
+        <h1 class="text-4xl sm:text-5xl font-normal tracking-tight text-neutral-900 leading-tight">
+            {{ site.tagline|default('Reflections on design, technology, and engineering.') }}
+        </h1>
+    </div>
+
+    <div class="space-y-12 divide-y divide-neutral-100">
+        {% for post in posts %}
+        <article class="pt-8 first:pt-0">
+            <span class="text-xs font-sans uppercase tracking-wider text-neutral-400">
+                {{ post.published_at ? post.published_at|date('F j, Y') : 'Published' }}
+            </span>
+            <h2 class="text-2xl sm:text-3xl font-normal text-neutral-900 mt-2 hover:underline">
+                <a href="/blog/{{ post.slug }}">{{ post.title }}</a>
+            </h2>
+            <p class="text-neutral-600 text-lg mt-3 leading-relaxed">
+                {{ post.excerpt|default('Read this story...') }}
+            </p>
+        </article>
+        {% else %}
+        <p class="text-neutral-400 text-center py-10 font-sans text-sm">No articles published yet.</p>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
