@@ -127,6 +127,39 @@ class StorefrontController extends AbstractController
         return $this->renderThemeTemplate('post.html.twig', $context);
     }
 
+    #[Route('/page/{slug}', name: 'storefront_page', methods: ['GET'])]
+    public function page(Request $request, string $slug): Response
+    {
+        $page = $this->postRepo->findBySlug($slug, 'page');
+        if (!$page) {
+            throw $this->createNotFoundException('Page not found');
+        }
+
+        $filteredContent = $this->hookManager->applyFilter('the_content', $page->getContent());
+        $filteredTitle = $this->hookManager->applyFilter('the_title', $page->getTitle());
+
+        $pageArray = $page->toArray();
+        $pageArray['content'] = $filteredContent;
+        $pageArray['title'] = $filteredTitle;
+
+        $context = [
+            'site' => [
+                'title' => $this->optionRepo->get('site_title', 'OpenSource eCommerce CMS'),
+                'tagline' => $this->optionRepo->get('site_tagline', 'Alternative to WordPress'),
+                'description' => $this->optionRepo->get('site_description', 'The modern, lightweight, monolithic & headless alternative to WordPress.'),
+                'url' => $this->optionRepo->get('site_url', $request->getSchemeAndHttpHost()),
+            ],
+            'page' => $pageArray,
+            'post' => $pageArray,
+            'theme' => [
+                'name' => $this->themeManager->getActiveTheme(),
+                'customizer' => $this->themeManager->getCustomizerOptions(),
+            ],
+        ];
+
+        return $this->renderThemeTemplate('page.html.twig', $context);
+    }
+
     #[Route('/product/{slug}', name: 'storefront_product', methods: ['GET'])]
     public function product(Request $request, string $slug): Response
     {
@@ -135,13 +168,23 @@ class StorefrontController extends AbstractController
             throw $this->createNotFoundException('Product not found');
         }
 
+        $productArray = $product->toArray();
+        if (!empty($productArray['description'])) {
+            $productArray['description'] = $this->hookManager->applyFilter('the_content', $productArray['description']);
+        }
+        if (!empty($productArray['title'])) {
+            $productArray['title'] = $this->hookManager->applyFilter('the_title', $productArray['title']);
+        }
+        $productArray = $this->hookManager->applyFilter('storefront_product_data', $productArray);
+
         $context = [
             'site' => [
                 'title' => $this->optionRepo->get('site_title', 'OpenSource eCommerce CMS'),
                 'tagline' => $this->optionRepo->get('site_tagline', 'Alternative to WordPress'),
                 'description' => $this->optionRepo->get('site_description', 'The modern, lightweight, monolithic & headless alternative to WordPress.'),
+                'url' => $this->optionRepo->get('site_url', $request->getSchemeAndHttpHost()),
             ],
-            'product' => $product->toArray(),
+            'product' => $productArray,
             'theme' => [
                 'name' => $this->themeManager->getActiveTheme(),
                 'customizer' => $this->themeManager->getCustomizerOptions(),
@@ -218,10 +261,30 @@ class StorefrontController extends AbstractController
         return $this->renderThemeTemplate('confirmation.html.twig', $context);
     }
 
+    #[Route('/api/v1/woocommerce/apply-coupon', name: 'api_woocommerce_apply_coupon', methods: ['POST'])]
+    public function applyCoupon(Request $request): JsonResponse
+    {
+        $data = json_decode($request->getContent(), true) ?: $request->request->all();
+        $code = trim((string)($data['code'] ?? ''));
+        $subtotal = (float)($data['subtotal'] ?? 0.0);
+
+        if (empty($code)) {
+            return new JsonResponse(['success' => false, 'message' => 'Please provide a coupon code.'], 400);
+        }
+
+        $result = $this->hookManager->applyFilter('woocommerce_validate_coupon', [
+            'success' => false,
+            'message' => "Invalid or expired coupon code: '{$code}'.",
+        ], $code, $subtotal);
+
+        return new JsonResponse($result);
+    }
+
     #[Route('/api/v1/checkout', name: 'api_checkout', methods: ['POST'])]
     public function processCheckout(Request $request): Response
     {
         $data = json_decode($request->getContent(), true) ?: $request->request->all();
+        $data = $this->hookManager->applyFilter('pre_process_checkout', $data);
 
         $items = $data['items'] ?? [];
         if (empty($items)) {
@@ -247,6 +310,12 @@ class StorefrontController extends AbstractController
         $shipping = $totalAmount >= 100.0 ? 0.0 : 15.0;
         $totalAmount += $shipping;
 
+        // Apply discount if coupon was attached
+        $discountAmount = (float)($data['discount_amount'] ?? 0.0);
+        if ($discountAmount > 0) {
+            $totalAmount = max(0.0, $totalAmount - $discountAmount);
+        }
+
         $shippingAddress = [
             'street' => $data['street'] ?? '',
             'city' => $data['city'] ?? '',
@@ -256,6 +325,8 @@ class StorefrontController extends AbstractController
             'phone' => $data['phone'] ?? '',
             'payment_method' => $data['payment_method'] ?? 'card',
             'shipping_fee' => $shipping,
+            'coupon_code' => $data['coupon_code'] ?? null,
+            'discount_amount' => $discountAmount,
         ];
 
         $orderNumber = 'ORD-' . strtoupper(bin2hex(random_bytes(4)));
@@ -286,6 +357,17 @@ class StorefrontController extends AbstractController
 
     private function renderThemeTemplate(string $template, array $context): Response
     {
+        if (!isset($context['headInjected'])) {
+            ob_start();
+            $this->hookManager->doAction('storefront_head');
+            $context['headInjected'] = ob_get_clean();
+        }
+        if (!isset($context['footerInjected'])) {
+            ob_start();
+            $this->hookManager->doAction('storefront_footer');
+            $context['footerInjected'] = ob_get_clean();
+        }
+
         $theme = $this->themeManager->getActiveTheme();
         $templatePath = "@theme/{$template}";
 

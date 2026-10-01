@@ -1,0 +1,49 @@
+{% extends "@theme/layout.html.twig" %}
+
+{% block title %}{{ page.meta.seo_title|default(page.title) }} — {{ site.title }}{% endblock %}
+
+{% block head %}
+    {% if page.meta.seo_description is defined and page.meta.seo_description %}
+    <meta name="description" content="{{ page.meta.seo_description }}">
+    {% elseif page.excerpt %}
+    <meta name="description" content="{{ page.excerpt }}">
+    {% endif %}
+
+    {% if page.meta.robots_index is defined %}
+    <meta name="robots" content="{{ page.meta.robots_index|default('index') }}, {{ page.meta.robots_follow|default('follow') }}">
+    {% endif %}
+
+    {% if page.meta.canonical_url is defined and page.meta.canonical_url %}
+    <link rel="canonical" href="{{ page.meta.canonical_url }}">
+    {% endif %}
+
+    <!-- Open Graph Social Meta -->
+    <meta property="og:title" content="{{ page.meta.og_title|default(page.meta.seo_title|default(page.title)) }}">
+    <meta property="og:description" content="{{ page.meta.og_description|default(page.meta.seo_description|default(page.excerpt)) }}">
+    <meta property="og:type" content="website">
+    {% if page.meta.og_image is defined and page.meta.og_image %}
+    <meta property="og:image" content="{{ page.meta.og_image }}">
+    {% elseif page.featured_image %}
+    <meta property="og:image" content="{{ page.featured_image }}">
+    {% endif %}
+
+    <!-- Twitter Card Meta -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="{{ page.meta.og_title|default(page.title) }}">
+    <meta name="twitter:description" content="{{ page.meta.og_description|default(page.excerpt) }}">
+{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    {% if page.featured_image %}
+    <div class="aspect-video max-w-4xl mx-auto rounded-3xl overflow-hidden bg-slate-900 border border-slate-800 shadow-2xl mb-12">
+        <img src="{{ page.featured_image }}" alt="{{ page.title }}" class="w-full h-full object-cover">
+    </div>
+    {% endif %}
+
+    <!-- Elementor / Page Content Slot -->
+    <div class="page-content space-y-6">
+        {{ page.content|raw }}
+    </div>
+</div>
+{% endblock %}

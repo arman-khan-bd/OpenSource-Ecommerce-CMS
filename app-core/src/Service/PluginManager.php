@@ -12,16 +12,52 @@ use App\Repository\PluginRepository;
  */
 class PluginManager
 {
+    private static ?self $instance = null;
     private string $pluginsDir;
     private PluginRepository $pluginRepo;
     private HookManager $hookManager;
     private array $loadedPlugins = [];
+    private array $pluginEntities = [];
 
     public function __construct(string $projectDir, PluginRepository $pluginRepo, HookManager $hookManager)
     {
         $this->pluginsDir = $projectDir . '/plugins';
         $this->pluginRepo = $pluginRepo;
         $this->hookManager = $hookManager;
+        self::$instance = $this;
+    }
+
+    public static function getInstance(): ?self
+    {
+        return self::$instance;
+    }
+
+    public function getActivePluginSlugs(): array
+    {
+        try {
+            $active = $this->pluginRepo->getActivePlugins();
+            return array_map(fn($p) => $p->getSlug(), $active);
+        } catch (\Throwable) {
+            return [];
+        }
+    }
+
+    public function isPluginActive(string $slug): bool
+    {
+        return in_array($slug, $this->getActivePluginSlugs(), true);
+    }
+
+    public function getPluginSettings(string $slug): array
+    {
+        if (isset($this->pluginEntities[$slug])) {
+            return $this->pluginEntities[$slug]->getSettings();
+        }
+        $plugin = $this->pluginRepo->findBySlug($slug);
+        if ($plugin) {
+            $this->pluginEntities[$slug] = $plugin;
+            return $plugin->getSettings();
+        }
+        return [];
     }
 
     public function getPluginsDirectory(): string
@@ -76,6 +112,7 @@ class PluginManager
 
         foreach ($activePlugins as $plugin) {
             $slug = $plugin->getSlug();
+            $this->pluginEntities[$slug] = $plugin;
             $mainFile = $this->pluginsDir . '/' . $slug . '/' . $slug . '.php';
 
             if (!file_exists($mainFile)) {

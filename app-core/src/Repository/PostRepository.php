@@ -154,4 +154,62 @@ class PostRepository
         $affected = $conn->executeStatement("DELETE FROM {$table} WHERE id = ?", [$id]);
         return $affected > 0;
     }
+
+    /**
+     * Generates a collision-free slug. If the slug already exists in DB,
+     * appends a sequential number suffix (e.g. old_1, old_2).
+     */
+    public function generateUniqueSlug(string $slug, ?int $excludeId = null, string $type = 'post'): string
+    {
+        $conn = $this->db->getConnection();
+        if (!$conn) {
+            return $slug;
+        }
+
+        $table = $this->db->tableName('posts');
+
+        // Clean and normalize slug
+        $cleanSlug = preg_replace('/[^a-z0-9_\-]+/i', '-', strtolower($slug));
+        $cleanSlug = trim($cleanSlug, '-_');
+        if ($cleanSlug === '') {
+            $cleanSlug = 'post';
+        }
+
+        // Check if the exact cleanSlug is already free
+        $params = [$cleanSlug];
+        $sql = "SELECT id FROM {$table} WHERE slug = ?";
+        if ($excludeId !== null) {
+            $sql .= " AND id != ?";
+            $params[] = $excludeId;
+        }
+
+        $existing = $conn->fetchOne($sql, $params);
+        if (!$existing) {
+            return $cleanSlug;
+        }
+
+        // It is taken. Extract base name without existing _<number> suffix if present
+        $baseSlug = $cleanSlug;
+        if (preg_match('/^(.*?)_([0-9]+)$/', $cleanSlug, $matches)) {
+            $baseSlug = $matches[1];
+        }
+
+        // Find all matching slugs in DB starting with $baseSlug
+        $likeParams = [$baseSlug, $baseSlug . '_%'];
+        $likeSql = "SELECT slug FROM {$table} WHERE (slug = ? OR slug LIKE ?)";
+        if ($excludeId !== null) {
+            $likeSql .= " AND id != ?";
+            $likeParams[] = $excludeId;
+        }
+
+        $takenSlugs = $conn->fetchFirstColumn($likeSql, $likeParams);
+        $takenMap = array_flip($takenSlugs);
+
+        $counter = 1;
+        while (isset($takenMap["{$baseSlug}_{$counter}"])) {
+            $counter++;
+        }
+
+        return "{$baseSlug}_{$counter}";
+    }
 }

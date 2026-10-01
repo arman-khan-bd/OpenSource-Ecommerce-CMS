@@ -1,0 +1,13 @@
+{
+  "name": "WP Rocket Turbo Cache",
+  "slug": "wp-rocket-cache",
+  "version": "3.15.8",
+  "author": "WP Media Performance Lab",
+  "description": "High-performance caching engine: DNS prefetching, instant page preloading on hover, image lazy-loading, and real-time TTFB telemetry.",
+  "settings": {
+    "enable_instant_page": true,
+    "enable_dns_prefetch": true,
+    "enable_lazyload": true,
+    "show_telemetry_comment": true
+  }
+}

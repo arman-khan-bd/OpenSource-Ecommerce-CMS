@@ -1,0 +1,44 @@
+{
+  "name": "WooCommerce Commerce Pro",
+  "slug": "woocommerce-core",
+  "version": "8.5.2",
+  "author": "Automattic & Commerce Team",
+  "description": "Full-featured eCommerce suite: Smart coupons & discounts engine, dynamic sales badges, inventory scarcity countdown, free shipping progress meter, checkout trust seals, and native Android SDUI commerce widgets.",
+  "settings": {
+    "currency_symbol": "$",
+    "currency_code": "USD",
+    "enable_coupons": true,
+    "free_shipping_threshold": 100,
+    "stock_urgency_threshold": 5,
+    "enable_sales_badges": true,
+    "enable_free_shipping_meter": true,
+    "enable_trust_badges": true,
+    "coupons": [
+      {
+        "code": "APEX20",
+        "type": "percent",
+        "amount": 20,
+        "description": "VIP Summer Sale — 20% OFF Everything"
+      },
+      {
+        "code": "WELCOME10",
+        "type": "percent",
+        "amount": 10,
+        "description": "New Customer Welcome — 10% OFF"
+      },
+      {
+        "code": "FREESHIP",
+        "type": "fixed",
+        "amount": 15,
+        "description": "Complimentary Free Express Shipping ($15 OFF)"
+      },
+      {
+        "code": "VIP50",
+        "type": "fixed",
+        "amount": 50,
+        "min_spend": 200,
+        "description": "$50 Instant Rebate on orders over $200"
+      }
+    ]
+  }
+}

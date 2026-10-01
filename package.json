@@ -1,0 +1,11 @@
+{
+  "name": "cms-workspace",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Modern eCommerce CMS - Monolithic & Headless Alternative to WordPress",
+  "scripts": {
+    "dev": "npm --prefix app-core/frontend run dev",
+    "build": "npm --prefix app-core/frontend run build",
+    "server": "php -S 127.0.0.1:8000 -t public_html"
+  }
+}

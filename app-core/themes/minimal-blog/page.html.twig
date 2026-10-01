@@ -1,0 +1,28 @@
+{% extends "@theme/layout.html.twig" %}
+
+{% block title %}{{ page.meta.seo_title|default(page.title) }} — {{ site.title }}{% endblock %}
+
+{% block content %}
+<article class="space-y-8">
+    <header class="space-y-4">
+        <h1 class="text-3xl sm:text-4xl font-semibold tracking-tight text-neutral-900 leading-tight">
+            {{ page.title }}
+        </h1>
+        {% if page.excerpt %}
+        <p class="text-lg text-neutral-600 font-serif italic">
+            {{ page.excerpt }}
+        </p>
+        {% endif %}
+    </header>
+
+    {% if page.featured_image %}
+    <div class="my-6 rounded-2xl overflow-hidden shadow-sm">
+        <img src="{{ page.featured_image }}" alt="{{ page.title }}" class="w-full h-auto object-cover">
+    </div>
+    {% endif %}
+
+    <div class="prose prose-neutral max-w-none font-serif text-lg leading-relaxed text-neutral-800 space-y-6">
+        {{ page.content|raw }}
+    </div>
+</article>
+{% endblock %}

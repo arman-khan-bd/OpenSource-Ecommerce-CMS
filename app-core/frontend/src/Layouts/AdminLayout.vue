@@ -21,7 +21,10 @@ import {
   Layers,
   Database,
   Menu,
-  X
+  X,
+  Layout,
+  Globe,
+  Send
 } from 'lucide-vue-next';
 
 const page = usePage();
@@ -34,17 +37,65 @@ const isSidebarOpen = ref(true);
 const isMobileSidebarOpen = ref(false);
 const isUserMenuOpen = ref(false);
 
-const navigation = [
-  { name: 'Dashboard', href: '/admin/dashboard', icon: LayoutDashboard },
-  { name: 'Posts & Pages', href: '/admin/posts', icon: FileText },
-  { name: 'Products', href: '/admin/products', icon: ShoppingBag },
-  { name: 'Orders', href: '/admin/orders', icon: ShoppingCart },
-  { name: 'Media Library', href: '/admin/media', icon: ImageIcon },
-  { name: 'Android SDUI Studio', href: '/admin/sdui', icon: Smartphone, badge: 'NATIVE' },
-  { name: 'Themes', href: '/admin/themes', icon: Palette },
-  { name: 'Plugins & Hooks', href: '/admin/plugins', icon: Puzzle },
-  { name: 'Settings & Cache', href: '/admin/settings', icon: Settings },
-];
+const activePlugins = computed(() => page.props.activePlugins || []);
+
+const navigation = computed(() => {
+  const items = [
+    { name: 'Dashboard', href: '/admin/dashboard', icon: LayoutDashboard },
+    { name: 'Blog Posts', href: '/admin/posts', icon: FileText },
+    { name: 'Pages', href: '/admin/pages', icon: Layers, badge: 'BUILDER' },
+    { name: 'Products', href: '/admin/products', icon: ShoppingBag },
+    { name: 'Orders', href: '/admin/orders', icon: ShoppingCart },
+  ];
+
+  // Dynamic WordPress-style Plugin management pages
+  if (activePlugins.value.includes('woocommerce-core')) {
+    items.push({
+      name: 'WooCommerce',
+      href: '/admin/woocommerce',
+      icon: ShoppingBag,
+      badge: 'COMMERCE',
+    });
+  }
+
+  if (activePlugins.value.includes('elementor-pro')) {
+    items.push({
+      name: 'Elementor Pro',
+      href: '/admin/elementor',
+      icon: Layout,
+      badge: 'PRO',
+    });
+  }
+
+  if (activePlugins.value.includes('yoast-seo-pro') || activePlugins.value.includes('seo-toolkit')) {
+    items.push({
+      name: 'Yoast SEO',
+      href: '/admin/seo',
+      icon: Globe,
+      badge: 'SEO',
+    });
+  }
+
+  if (activePlugins.value.includes('wpforms-builder')) {
+    items.push({
+      name: 'WPForms',
+      href: '/admin/wpforms',
+      icon: Send,
+      badge: 'LEADS',
+    });
+  }
+
+  items.push(
+    { name: 'Media Library', href: '/admin/media', icon: ImageIcon },
+    { name: 'Android SDUI Studio', href: '/admin/sdui', icon: Smartphone, badge: 'NATIVE' },
+    { name: 'PWA App Studio', href: '/admin/pwa', icon: Bell, badge: 'PWA' },
+    { name: 'Themes', href: '/admin/themes', icon: Palette },
+    { name: 'Plugins & Hooks', href: '/admin/plugins', icon: Puzzle },
+    { name: 'Settings & Cache', href: '/admin/settings', icon: Settings }
+  );
+
+  return items;
+});
 
 const currentUrl = computed(() => page.url);
 
@@ -93,6 +144,38 @@ function logout() {
 
     <!-- Main Container -->
     <div class="flex-1 flex overflow-hidden">
+      <!-- Mobile Sidebar Drawer -->
+      <div v-if="isMobileSidebarOpen" class="fixed inset-0 z-50 md:hidden flex">
+        <div class="fixed inset-0 bg-black/60 backdrop-blur-sm" @click="isMobileSidebarOpen = false"></div>
+        <div class="relative flex flex-col w-72 max-w-[80vw] bg-slate-900 border-r border-slate-800 z-10 p-4">
+          <div class="flex items-center justify-between pb-4 border-b border-slate-800">
+            <div class="flex items-center space-x-2">
+              <div class="w-8 h-8 rounded-lg bg-gradient-to-tr from-indigo-500 to-pink-500 flex items-center justify-center font-bold text-white">O</div>
+              <span class="font-bold text-white text-sm">OpenSource CMS</span>
+            </div>
+            <button @click="isMobileSidebarOpen = false" class="text-slate-400 hover:text-white p-1 rounded-lg">
+              <X class="w-5 h-5" />
+            </button>
+          </div>
+          <div class="flex-1 overflow-y-auto py-4 space-y-1">
+            <Link v-for="item in navigation" :key="item.name" :href="item.href"
+                  @click="isMobileSidebarOpen = false"
+                  :class="[
+                    isActive(item.href)
+                      ? 'bg-gradient-to-r from-indigo-600 to-indigo-700 text-white font-semibold'
+                      : 'text-slate-400 hover:bg-slate-800/60 hover:text-slate-200 font-medium',
+                    'group flex items-center px-3 py-2.5 rounded-xl text-sm transition-all duration-150'
+                  ]">
+              <component :is="item.icon" class="w-5 h-5 mr-3 shrink-0" />
+              <span class="truncate flex-1">{{ item.name }}</span>
+              <span v-if="item.badge" class="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 uppercase">
+                {{ item.badge }}
+              </span>
+            </Link>
+          </div>
+        </div>
+      </div>
+
       <!-- Desktop Sidebar -->
       <aside :class="[
         isSidebarOpen ? 'w-64' : 'w-20',
@@ -180,6 +263,13 @@ function logout() {
                   class="hidden sm:flex items-center space-x-1.5 px-3 py-1.5 rounded-lg bg-indigo-950/70 hover:bg-indigo-900/60 text-indigo-300 border border-indigo-500/30 text-xs font-semibold transition-all">
               <Smartphone class="w-3.5 h-3.5 text-indigo-400" />
               <span>SDUI Builder</span>
+            </Link>
+
+            <!-- PWA Studio Direct Link -->
+            <Link href="/admin/pwa"
+                  class="hidden md:flex items-center space-x-1.5 px-3 py-1.5 rounded-lg bg-emerald-950/60 hover:bg-emerald-900/50 text-emerald-300 border border-emerald-500/30 text-xs font-semibold transition-all">
+              <Bell class="w-3.5 h-3.5 text-emerald-400" />
+              <span>PWA Studio</span>
             </Link>
 
             <!-- User Menu -->

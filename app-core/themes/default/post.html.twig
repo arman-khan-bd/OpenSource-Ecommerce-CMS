@@ -1,14 +1,55 @@
 {% extends "@theme/layout.html.twig" %}
 
-{% block title %}{{ post.title }} — {{ site.title }}{% endblock %}
+{% block title %}{{ post.meta.seo_title|default(post.title) }} — {{ site.title }}{% endblock %}
+
+{% block head %}
+    {% if post.meta.seo_description is defined and post.meta.seo_description %}
+    <meta name="description" content="{{ post.meta.seo_description }}">
+    {% elseif post.excerpt %}
+    <meta name="description" content="{{ post.excerpt }}">
+    {% endif %}
+
+    {% if post.meta.robots_index is defined %}
+    <meta name="robots" content="{{ post.meta.robots_index|default('index') }}, {{ post.meta.robots_follow|default('follow') }}">
+    {% endif %}
+
+    {% if post.meta.canonical_url is defined and post.meta.canonical_url %}
+    <link rel="canonical" href="{{ post.meta.canonical_url }}">
+    {% endif %}
+
+    <!-- Open Graph Social Meta -->
+    <meta property="og:title" content="{{ post.meta.og_title|default(post.meta.seo_title|default(post.title)) }}">
+    <meta property="og:description" content="{{ post.meta.og_description|default(post.meta.seo_description|default(post.excerpt)) }}">
+    <meta property="og:type" content="article">
+    {% if post.meta.og_image is defined and post.meta.og_image %}
+    <meta property="og:image" content="{{ post.meta.og_image }}">
+    {% elseif post.featured_image %}
+    <meta property="og:image" content="{{ post.featured_image }}">
+    {% endif %}
+
+    <!-- Twitter Card Meta -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="{{ post.meta.og_title|default(post.title) }}">
+    <meta name="twitter:description" content="{{ post.meta.og_description|default(post.excerpt) }}">
+{% endblock %}
 
 {% block content %}
 <article class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
     <div class="space-y-4 text-center mb-10">
-        <div class="inline-flex items-center space-x-2 text-xs font-semibold uppercase tracking-wider text-brand-400">
-            <span>Editorial Article</span>
+        <div class="inline-flex flex-wrap items-center justify-center gap-2 text-xs font-semibold uppercase tracking-wider text-brand-400">
+            {% if post.meta.categories is defined and post.meta.categories is iterable %}
+                {% for cat in post.meta.categories %}
+                <span class="px-2.5 py-1 rounded-full bg-brand-500/10 text-brand-400 border border-brand-500/20 lowercase tracking-normal font-medium">#{{ cat }}</span>
+                {% endfor %}
+            {% else %}
+                <span>Editorial Article</span>
+            {% endif %}
             <span>•</span>
             <span>{{ post.published_at ? post.published_at|date('F j, Y') : 'Published' }}</span>
+            {% if post.meta.reading_time is defined and post.meta.reading_time %}
+            <span>•</span>
+            <span class="text-indigo-300 font-mono">{{ post.meta.reading_time }} min read</span>
+            {% endif %}
         </div>
         <h1 class="text-3xl sm:text-5xl font-extrabold font-display text-white tracking-tight leading-tight">
             {{ post.title }}
@@ -30,7 +71,18 @@
         {{ post.content|raw }}
     </div>
 
-    <div class="mt-16 pt-8 border-t border-slate-800 flex items-center justify-between">
+    {% if post.meta.tags is defined and post.meta.tags is iterable and post.meta.tags|length > 0 %}
+    <div class="mt-12 pt-6 border-t border-slate-800/80">
+        <div class="flex flex-wrap items-center gap-2">
+            <span class="text-xs font-semibold uppercase text-slate-400">Tags:</span>
+            {% for tag in post.meta.tags %}
+            <span class="px-3 py-1 rounded-lg bg-slate-900 border border-slate-800 text-xs font-medium text-slate-300">#{{ tag }}</span>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    <div class="mt-12 pt-8 border-t border-slate-800 flex items-center justify-between">
         <a href="/" class="text-sm font-semibold text-brand-400 hover:text-brand-300 flex items-center space-x-2">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
             <span>Back to Stories</span>
@@ -44,3 +96,4 @@
     </div>
 </article>
 {% endblock %}
+

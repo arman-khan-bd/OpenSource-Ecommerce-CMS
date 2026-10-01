@@ -1,0 +1,15 @@
+{
+  "name": "Elementor Pro Visual Builder",
+  "slug": "elementor-pro",
+  "version": "3.19.4",
+  "author": "Elementor Team",
+  "description": "Premium visual page builder: Drag-and-drop shortcodes (Hero Banners, Pricing Grids, Testimonials, Live Countdowns, FAQ Accordions), interactive floating support desk, and responsive design animations.",
+  "settings": {
+    "primary_accent": "#6366f1",
+    "enable_floating_support": true,
+    "support_phone": "+1 (800) 555-0199",
+    "support_email": "support@example.com",
+    "whatsapp_number": "18005550199",
+    "enable_micro_animations": true
+  }
+}

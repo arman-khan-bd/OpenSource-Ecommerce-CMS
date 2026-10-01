@@ -1,31 +1,100 @@
 {% extends "@theme/layout.html.twig" %}
 
-{% block title %}{{ product.title }} — {{ site.title }}{% endblock %}
+{% block title %}{{ product.meta.seo_title|default(product.title) }} — {{ site.title }}{% endblock %}
+
+{% block head %}
+    {% if product.meta.seo_description is defined and product.meta.seo_description %}
+    <meta name="description" content="{{ product.meta.seo_description }}">
+    {% elseif product.description %}
+    <meta name="description" content="{{ product.description|striptags|slice(0, 160) }}">
+    {% endif %}
+
+    {% if product.meta.robots_index is defined %}
+    <meta name="robots" content="{{ product.meta.robots_index|default('index') }}, {{ product.meta.robots_follow|default('follow') }}">
+    {% endif %}
+
+    {% if product.meta.canonical_url is defined and product.meta.canonical_url %}
+    <link rel="canonical" href="{{ product.meta.canonical_url }}">
+    {% endif %}
+
+    <!-- Open Graph Product Meta -->
+    <meta property="og:title" content="{{ product.meta.og_title|default(product.meta.seo_title|default(product.title)) }}">
+    <meta property="og:description" content="{{ product.meta.og_description|default(product.meta.seo_description|default(product.description|striptags|slice(0, 160))) }}">
+    <meta property="og:type" content="product">
+    <meta property="product:price:amount" content="{{ product.sale_price|default(product.price) }}">
+    <meta property="product:price:currency" content="USD">
+    {% if product.images is defined and product.images[0] is defined %}
+    <meta property="og:image" content="{{ product.images[0] }}">
+    {% endif %}
+
+    <!-- Twitter Card Meta -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="{{ product.meta.og_title|default(product.title) }}">
+    <meta name="twitter:description" content="{{ product.meta.og_description|default(product.description|striptags|slice(0, 160)) }}">
+{% endblock %}
 
 {% block content %}
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16">
         <!-- Media Gallery -->
         <div class="space-y-4">
-            <div class="aspect-square w-full rounded-2xl overflow-hidden bg-slate-900 border border-slate-800 shadow-xl">
-                <img src="{{ product.images[0]|default('https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=800&q=80') }}" 
+            <!-- Main Display Image -->
+            <div class="aspect-square w-full rounded-2xl overflow-hidden bg-slate-900 border border-slate-800 shadow-2xl relative group">
+                <img id="main-product-img" 
+                     src="{{ product.images[0]|default('https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=800&q=80') }}" 
                      alt="{{ product.title }}" 
-                     class="w-full h-full object-cover">
+                     class="w-full h-full object-cover transition-all duration-300">
+                {% if product.sale_price and product.price > product.sale_price %}
+                <span class="absolute top-4 left-4 px-3 py-1 rounded-xl bg-gradient-to-r from-rose-500 to-pink-500 text-white font-extrabold text-xs shadow-lg shadow-rose-500/30">
+                    SALE -{{ (((product.price - product.sale_price) / product.price) * 100)|round }}%
+                </span>
+                {% endif %}
             </div>
+
+            <!-- Thumbnail Selector Gallery -->
+            {% if product.images|length > 1 %}
+            <div class="grid grid-cols-4 sm:grid-cols-5 gap-3 pt-2">
+                {% for img in product.images %}
+                <button type="button" onclick="document.getElementById('main-product-img').src = '{{ img }}';" 
+                        class="aspect-square rounded-xl overflow-hidden bg-slate-900 border border-slate-800 hover:border-brand-500 focus:ring-2 focus:ring-brand-500 transition-all">
+                    <img src="{{ img }}" alt="Thumbnail" class="w-full h-full object-cover">
+                </button>
+                {% endfor %}
+            </div>
+            {% endif %}
         </div>
 
-        <!-- Product Information -->
+        <!-- Product Information & Order Actions -->
         <div class="flex flex-col justify-between space-y-8">
             <div class="space-y-4">
-                <div class="flex items-center space-x-3">
-                    <span class="text-xs font-bold uppercase tracking-wider text-brand-400">
-                        {{ product.meta.category|default('Hardware') }}
-                    </span>
+                <!-- Badges & Category Header -->
+                <div class="flex flex-wrap items-center gap-2">
+                    {% if product.meta.categories is defined and product.meta.categories is iterable %}
+                        {% for cat in product.meta.categories %}
+                        <span class="px-2.5 py-0.5 rounded-full bg-brand-500/10 text-brand-400 border border-brand-500/20 text-xs font-semibold">
+                            {{ cat }}
+                        </span>
+                        {% endfor %}
+                    {% else %}
+                        <span class="text-xs font-bold uppercase tracking-wider text-brand-400">
+                            {{ product.meta.category|default('Hardware') }}
+                        </span>
+                    {% endif %}
+
+                    {% if product.meta.tags is defined and product.meta.tags is iterable %}
+                        {% for tag in product.meta.tags %}
+                        <span class="px-2 py-0.5 rounded-md bg-slate-800/80 text-slate-300 text-[11px] font-medium border border-slate-700">
+                            #{{ tag }}
+                        </span>
+                        {% endfor %}
+                    {% endif %}
+
                     <span class="text-slate-600">•</span>
-                    <span class="text-xs text-slate-400 font-mono">SKU: {{ product.sku|default('GEN-01') }}</span>
+                    <span class="text-xs text-slate-400 font-mono">SKU: {{ product.sku|default('PRD-01') }}</span>
+
                     {% if product.stock > 0 %}
                     <span class="px-2.5 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-[11px] font-semibold">
-                        In Stock ({{ product.stock }})
+                        In Stock ({{ product.stock }} units)
                     </span>
                     {% else %}
                     <span class="px-2.5 py-0.5 rounded-full bg-rose-500/10 border border-rose-500/20 text-rose-400 text-[11px] font-semibold">
@@ -34,23 +103,46 @@
                     {% endif %}
                 </div>
 
-                <h1 class="text-3xl sm:text-4xl font-extrabold font-display text-white tracking-tight">
+                <h1 class="text-3xl sm:text-4xl font-extrabold font-display text-white tracking-tight leading-tight">
                     {{ product.title }}
                 </h1>
 
-                <div class="flex items-baseline space-x-3">
+                <!-- Pricing & Savings -->
+                <div class="flex items-baseline space-x-3 pt-1">
                     {% if product.sale_price %}
-                        <span class="text-3xl font-extrabold font-display text-white">${{ product.sale_price|number_format(2) }}</span>
+                        <span class="text-3xl sm:text-4xl font-extrabold font-display text-white">${{ product.sale_price|number_format(2) }}</span>
                         <span class="text-lg text-slate-500 line-through">${{ product.price|number_format(2) }}</span>
-                        <span class="px-2 py-0.5 rounded bg-rose-500/20 text-rose-400 text-xs font-bold">SAVE ${{ (product.price - product.sale_price)|number_format(2) }}</span>
+                        <span class="px-2.5 py-1 rounded-lg bg-rose-500/20 text-rose-400 text-xs font-bold">SAVE ${{ (product.price - product.sale_price)|number_format(2) }}</span>
                     {% else %}
-                        <span class="text-3xl font-extrabold font-display text-white">${{ product.price|number_format(2) }}</span>
+                        <span class="text-3xl sm:text-4xl font-extrabold font-display text-white">${{ product.price|number_format(2) }}</span>
                     {% endif %}
                 </div>
 
-                <div class="text-sm text-slate-300 leading-relaxed pt-4 border-t border-slate-800">
-                    <p>{{ product.description|default('Premium engineering designed for high reliability and exceptional performance.') }}</p>
+                <!-- Description (HTML supported) -->
+                <div class="prose prose-invert prose-indigo max-w-none text-slate-300 text-sm leading-relaxed pt-4 border-t border-slate-800">
+                    {{ product.description|raw }}
                 </div>
+
+                <!-- Specifications & Attributes Table -->
+                {% if product.meta.attributes is defined and product.meta.attributes is iterable and product.meta.attributes|length > 0 %}
+                <div class="pt-6 border-t border-slate-800 space-y-3">
+                    <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400">Technical Specifications</h3>
+                    <div class="rounded-xl border border-slate-800 overflow-hidden divide-y divide-slate-800 text-xs bg-slate-900/50">
+                        {% for attr in product.meta.attributes %}
+                        <div class="grid grid-cols-3 p-3">
+                            <span class="text-slate-400 font-semibold">{{ attr.name }}</span>
+                            <span class="col-span-2 text-white font-medium">{{ attr.value }}</span>
+                        </div>
+                        {% endfor %}
+                        {% if product.meta.weight is defined and product.meta.weight %}
+                        <div class="grid grid-cols-3 p-3">
+                            <span class="text-slate-400 font-semibold">Weight</span>
+                            <span class="col-span-2 text-white font-medium">{{ product.meta.weight }}</span>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endif %}
             </div>
 
             <!-- Action Buttons -->
@@ -61,13 +153,13 @@
                 </button>
 
                 <div class="flex items-center justify-between text-xs text-slate-400 px-2">
-                    <span class="flex items-center space-x-1">
+                    <span class="flex items-center space-x-1.5">
                         <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
                         <span>Complimentary Express Shipping</span>
                     </span>
-                    <span class="flex items-center space-x-1">
+                    <span class="flex items-center space-x-1.5">
                         <svg class="w-4 h-4 text-brand-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
-                        <span>2-Year Manufacturer Warranty</span>
+                        <span>Warranty & Authenticity Guarantee</span>
                     </span>
                 </div>
             </div>
@@ -75,3 +167,4 @@
     </div>
 </div>
 {% endblock %}
+

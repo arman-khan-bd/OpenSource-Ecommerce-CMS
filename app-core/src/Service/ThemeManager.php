@@ -30,6 +30,16 @@ class ThemeManager
     {
         $this->activeTheme = (string)$this->optionRepo->get('active_theme', 'default');
         $this->configureTwigLoader();
+        $this->bootActiveTheme();
+    }
+
+    public function bootActiveTheme(): void
+    {
+        $themeDir = $this->themesDir . '/' . $this->getActiveTheme();
+        $functionsFile = $themeDir . '/functions.php';
+        if (file_exists($functionsFile)) {
+            require_once $functionsFile;
+        }
     }
 
     public function getActiveTheme(): string
@@ -47,6 +57,7 @@ class ThemeManager
         $this->activeTheme = $themeSlug;
         $this->optionRepo->set('active_theme', $themeSlug);
         $this->configureTwigLoader();
+        $this->bootActiveTheme();
         return true;
     }
 

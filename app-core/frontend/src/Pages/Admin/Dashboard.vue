@@ -1,5 +1,5 @@
 <script setup>
-import { computed } from 'vue';
+import { computed, ref, onMounted } from 'vue';
 import { Link } from '@inertiajs/vue3';
 import AdminLayout from '@/Layouts/AdminLayout.vue';
 import {
@@ -14,7 +14,10 @@ import {
   Zap,
   CheckCircle2,
   ExternalLink,
-  Plus
+  Plus,
+  Download,
+  Bell,
+  ShieldCheck
 } from 'lucide-vue-next';
 
 const props = defineProps({
@@ -24,6 +27,72 @@ const props = defineProps({
   recentProducts: Array,
   systemInfo: Object,
 });
+
+// PWA Install & Push notification state
+const deferredPrompt = ref(null);
+const canInstall = ref(false);
+const isInstalled = ref(false);
+const pushAlertStatus = ref('');
+
+onMounted(() => {
+  if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true) {
+    isInstalled.value = true;
+  }
+
+  window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredPrompt.value = e;
+    canInstall.value = true;
+  });
+
+  window.addEventListener('appinstalled', () => {
+    isInstalled.value = true;
+    canInstall.value = false;
+    deferredPrompt.value = null;
+  });
+});
+
+async function installDashboardApp() {
+  if (deferredPrompt.value) {
+    deferredPrompt.value.prompt();
+    const { outcome } = await deferredPrompt.value.userChoice;
+    if (outcome === 'accepted') {
+      isInstalled.value = true;
+      canInstall.value = false;
+    }
+    deferredPrompt.value = null;
+  } else {
+    alert('To install the Admin Dashboard PWA:\n• Desktop: Click the install icon in your address bar (top right).\n• Mobile: Tap Share -> Add to Home Screen.');
+  }
+}
+
+async function triggerDashboardPush() {
+  pushAlertStatus.value = 'Triggering native dropdown alert...';
+  try {
+    if ('Notification' in window) {
+      const perm = await Notification.requestPermission();
+      if (perm === 'granted') {
+        if ('serviceWorker' in navigator) {
+          const reg = await navigator.serviceWorker.ready;
+          reg.showNotification('Admin Dashboard Live Alert', {
+            body: 'Real-time metrics & SDUI system active. Store is fully operational.',
+            icon: '/icon-192.png',
+            badge: '/badge-72.png',
+            vibrate: [100, 50, 100],
+            data: { url: '/admin/dashboard' }
+          });
+          pushAlertStatus.value = '✓ Native dropdown alert shown!';
+        }
+      } else {
+        pushAlertStatus.value = 'Push notifications blocked in browser settings.';
+      }
+    }
+  } catch (err) {
+    pushAlertStatus.value = 'Push error: ' + err.message;
+  }
+
+  setTimeout(() => { pushAlertStatus.value = ''; }, 3500);
+}
 </script>
 
 <template>
@@ -35,7 +104,21 @@ const props = defineProps({
           <h1 class="text-2xl font-bold font-sans text-white tracking-tight">Admin Overview & Metrics</h1>
           <p class="text-xs text-indigo-200 mt-1">Real-time status for storefront, e-commerce, and Android SDUI mobile app.</p>
         </div>
-        <div class="flex items-center space-x-3">
+        <div class="flex flex-wrap items-center gap-2.5">
+          <!-- Install Admin App PWA Button -->
+          <button @click="installDashboardApp"
+                  class="px-3.5 py-2 rounded-xl bg-gradient-to-r from-emerald-600/30 to-teal-600/30 hover:from-emerald-600/40 hover:to-teal-600/40 border border-emerald-500/40 text-emerald-300 hover:text-white text-xs font-bold flex items-center space-x-1.5 transition-all shadow-sm">
+            <Download class="w-3.5 h-3.5 text-emerald-400" />
+            <span>{{ isInstalled ? 'Admin App Installed' : 'Install Admin App' }}</span>
+          </button>
+
+          <!-- Push Test Alert Button -->
+          <button @click="triggerDashboardPush"
+                  class="px-3.5 py-2 rounded-xl bg-purple-950/60 hover:bg-purple-900/50 border border-purple-500/30 text-purple-300 hover:text-white text-xs font-bold flex items-center space-x-1.5 transition-all">
+            <Bell class="w-3.5 h-3.5 text-purple-400" />
+            <span>Test Web Push</span>
+          </button>
+
           <Link href="/admin/posts/new" class="px-3.5 py-2 rounded-xl bg-slate-900/80 hover:bg-slate-800 text-slate-200 border border-slate-700 text-xs font-semibold flex items-center space-x-1.5 transition-all">
             <Plus class="w-3.5 h-3.5" />
             <span>New Post</span>
@@ -49,6 +132,13 @@ const props = defineProps({
             <span>SDUI Studio</span>
           </Link>
         </div>
+      </div>
+
+      <!-- Flash Toast for Push Test on Dashboard -->
+      <div v-if="pushAlertStatus"
+           class="p-3 rounded-xl bg-indigo-950/90 border border-indigo-500/40 text-indigo-200 text-xs flex items-center space-x-2 animate-pulse shadow-xl">
+        <Zap class="w-4 h-4 text-amber-400 shrink-0" />
+        <span>{{ pushAlertStatus }}</span>
       </div>
 
       <!-- Stats Metric Cards -->

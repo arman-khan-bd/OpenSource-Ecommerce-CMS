@@ -22,6 +22,10 @@ class HookManager
     public function __construct(?EventDispatcherInterface $dispatcher = null)
     {
         $this->dispatcher = $dispatcher;
+        if (self::$instance !== null) {
+            $this->actions = self::$instance->actions;
+            $this->filters = self::$instance->filters;
+        }
         self::$instance = $this;
     }
 

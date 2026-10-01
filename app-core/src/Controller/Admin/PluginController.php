@@ -10,6 +10,7 @@ use App\Service\CacheFallbackService;
 use App\Service\HookManager;
 use App\Service\InertiaService;
 use App\Service\PluginManager;
+use App\Repository\PluginRepository;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -20,6 +21,7 @@ class PluginController extends BaseAdminController
 {
     private PluginManager $pluginManager;
     private HookManager $hookManager;
+    private PluginRepository $pluginRepo;
 
     public function __construct(
         AuthService $auth,
@@ -27,11 +29,13 @@ class PluginController extends BaseAdminController
         OptionRepository $optionRepo,
         CacheFallbackService $cacheService,
         PluginManager $pluginManager,
-        HookManager $hookManager
+        HookManager $hookManager,
+        PluginRepository $pluginRepo
     ) {
         parent::__construct($auth, $inertia, $optionRepo, $cacheService);
         $this->pluginManager = $pluginManager;
         $this->hookManager = $hookManager;
+        $this->pluginRepo = $pluginRepo;
     }
 
     #[Route('/admin/plugins', name: 'admin_plugins', methods: ['GET'])]
@@ -68,5 +72,31 @@ class PluginController extends BaseAdminController
         }
 
         return new JsonResponse(['success' => true, 'is_active' => $isActive]);
+    }
+
+    #[Route('/admin/plugins/settings', name: 'admin_plugins_settings', methods: ['POST'])]
+    public function updateSettings(Request $request): Response
+    {
+        $data = json_decode($request->getContent(), true) ?: $request->request->all();
+        $slug = $data['slug'] ?? '';
+        $settings = $data['settings'] ?? [];
+
+        $plugin = $this->pluginRepo->findBySlug($slug);
+        if (!$plugin) {
+            return new JsonResponse(['success' => false, 'message' => 'Plugin not found.'], 404);
+        }
+
+        $plugin->setSettings($settings);
+        $this->pluginRepo->save($plugin);
+
+        $this->hookManager->doAction('plugin_settings_updated_' . $slug, $settings);
+
+        $request->getSession()->getFlashBag()->add('success', "Settings updated for {$plugin->getName()}.");
+
+        if ($request->headers->get('X-Inertia') === 'true') {
+            return new RedirectResponse('/admin/plugins');
+        }
+
+        return new JsonResponse(['success' => true, 'settings' => $plugin->getSettings()]);
     }
 }

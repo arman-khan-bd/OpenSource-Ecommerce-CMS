@@ -57,6 +57,11 @@ abstract class BaseAdminController extends AbstractController
 
         $this->inertia->share('cacheStatus', $this->cacheService->getDriverInfo());
 
+        // Share active plugins for dynamic WordPress-style navigation
+        $pm = \App\Service\PluginManager::getInstance();
+        $activePlugins = $pm ? $pm->getActivePluginSlugs() : [];
+        $this->inertia->share('activePlugins', $activePlugins);
+
         // Flash messages
         $session = $request->getSession();
         $this->inertia->share('flash', [

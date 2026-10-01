@@ -1,0 +1,31 @@
+{
+    "name": "Admin Dashboard — OpenSource eCommerce CMS",
+    "short_name": "Admin Dashboard",
+    "description": "Dedicated Progressive Web App for OpenSource eCommerce CMS Admin Dashboard & SDUI Studio",
+    "start_url": "/admin/dashboard",
+    "scope": "/admin",
+    "display": "standalone",
+    "orientation": "any",
+    "background_color": "#020617",
+    "theme_color": "#4f46e5",
+    "icons": [
+        {
+            "src": "/icon-192.png",
+            "sizes": "192x192",
+            "type": "image/png",
+            "purpose": "any maskable"
+        },
+        {
+            "src": "/icon-512.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "any maskable"
+        },
+        {
+            "src": "/badge-72.png",
+            "sizes": "72x72",
+            "type": "image/png",
+            "purpose": "any"
+        }
+    ]
+}
