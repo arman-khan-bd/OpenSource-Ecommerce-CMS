@@ -355,6 +355,43 @@ class StorefrontController extends AbstractController
         ]);
     }
 
+    #[Route('/sitemap.xml', name: 'storefront_sitemap', methods: ['GET'])]
+    public function sitemap(Request $request): Response
+    {
+        $pm = \App\Service\PluginManager::getInstance();
+        $isYoastActive = $pm && ($pm->isPluginActive('yoast-seo-pro') || $pm->isPluginActive('seo-toolkit'));
+        if (!$isYoastActive) {
+            throw $this->createNotFoundException('XML Sitemap is disabled because Yoast SEO is inactive.');
+        }
+
+        $host = $this->optionRepo->get('site_url', $request->getSchemeAndHttpHost());
+        $posts = $this->postRepo->paginate('post', 1, 100, 'published')['items'];
+        $pages = $this->postRepo->paginate('page', 1, 100, 'published')['items'];
+        $products = $this->productRepo->paginate(1, 100, 'active')['items'];
+
+        $xml = '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
+        $xml .= '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' . "\n";
+        
+        $xml .= '  <url><loc>' . htmlspecialchars($host . '/') . '</loc><changefreq>daily</changefreq><priority>1.0</priority></url>' . "\n";
+        $xml .= '  <url><loc>' . htmlspecialchars($host . '/shop') . '</loc><changefreq>daily</changefreq><priority>0.9</priority></url>' . "\n";
+
+        foreach ($pages as $p) {
+            $xml .= '  <url><loc>' . htmlspecialchars($host . '/page/' . $p['slug']) . '</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>' . "\n";
+        }
+
+        foreach ($posts as $p) {
+            $xml .= '  <url><loc>' . htmlspecialchars($host . '/blog/' . $p['slug']) . '</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>' . "\n";
+        }
+
+        foreach ($products as $pr) {
+            $xml .= '  <url><loc>' . htmlspecialchars($host . '/product/' . $pr['slug']) . '</loc><changefreq>daily</changefreq><priority>0.8</priority></url>' . "\n";
+        }
+
+        $xml .= '</urlset>';
+
+        return new Response($xml, 200, ['Content-Type' => 'application/xml; charset=UTF-8']);
+    }
+
     private function renderThemeTemplate(string $template, array $context): Response
     {
         if (!isset($context['headInjected'])) {

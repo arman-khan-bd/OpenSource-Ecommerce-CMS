@@ -79,18 +79,25 @@ function deletePage(id, title) {
         </div>
 
         <div class="flex items-center space-x-3">
+          <!-- Normal Add New Page button -->
           <Link
-            href="/admin/pages/new"
-            :class="[
-              isElementorActive
-                ? 'bg-gradient-to-r from-pink-600 via-indigo-600 to-purple-600 hover:from-pink-500 hover:to-indigo-500 shadow-pink-600/30'
-                : 'bg-indigo-600 hover:bg-indigo-500 shadow-indigo-600/30',
-              'px-4 py-2 rounded-xl text-white font-bold text-xs flex items-center space-x-1.5 shadow-lg transition-all active:scale-95'
-            ]"
+            href="/admin/pages/new?builder=classic"
+            class="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs flex items-center space-x-1.5 shadow-lg shadow-indigo-600/30 transition-all active:scale-95"
+            title="Create page with standard WordPress editor"
           >
-            <Sparkles v-if="isElementorActive" class="w-4 h-4 text-amber-300" />
-            <Plus v-else class="w-4 h-4" />
-            <span>{{ isElementorActive ? 'Add New Page (Elementor Pro)' : 'Add New Page' }}</span>
+            <Plus class="w-4 h-4" />
+            <span>Add New Page</span>
+          </Link>
+
+          <!-- Elementor Pro Quick Creator (if Elementor is active) -->
+          <Link
+            v-if="isElementorActive"
+            href="/admin/pages/new?builder=elementor"
+            class="px-4 py-2 rounded-xl bg-gradient-to-r from-pink-600 via-indigo-600 to-purple-600 hover:from-pink-500 hover:to-indigo-500 text-white font-bold text-xs flex items-center space-x-1.5 shadow-lg shadow-pink-600/30 transition-all active:scale-95"
+            title="Create page directly with Elementor Pro Visual Builder"
+          >
+            <Sparkles class="w-4 h-4 text-amber-300" />
+            <span>Add with Elementor</span>
           </Link>
         </div>
       </div>
@@ -183,27 +190,33 @@ function deletePage(id, title) {
                 {{ item.published_at ? item.published_at.substring(0, 10) : item.created_at ? item.created_at.substring(0, 10) : 'Recent' }}
               </td>
 
-              <td class="py-4 px-4 text-right font-sans space-x-1.5">
-                <a :href="`/page/${item.slug}`" target="_blank" class="px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold inline-flex items-center space-x-1 transition-colors">
+              <td class="py-4 px-4 text-right font-sans space-x-1.5 whitespace-nowrap">
+                <a :href="`/page/${item.slug}`" target="_blank" class="px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold inline-flex items-center space-x-1 transition-colors" title="Preview Live">
                   <Eye class="w-3.5 h-3.5" />
                   <span>View</span>
                 </a>
+
+                <!-- Normal / Classic Page Edit (ALWAYS visible) -->
                 <Link
-                  v-if="isElementorActive && ((item.content || '').includes('[elementor') || (item.meta && item.meta.builder === 'elementor'))"
-                  :href="`/admin/pages/${item.id}/edit`"
-                  class="px-3.5 py-1.5 rounded-lg bg-pink-600 hover:bg-pink-500 text-white font-bold text-xs inline-flex items-center space-x-1.5 shadow-md shadow-pink-600/30 transition-all"
+                  :href="`/admin/pages/${item.id}/edit?builder=classic`"
+                  class="px-3 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs inline-flex items-center space-x-1.5 shadow-md shadow-indigo-600/30 transition-all"
+                  title="Normal page edit with standard editor"
+                >
+                  <Edit class="w-3.5 h-3.5" />
+                  <span>Edit</span>
+                </Link>
+
+                <!-- Elementor Edit (Visible whenever Elementor Pro is active) -->
+                <Link
+                  v-if="isElementorActive"
+                  :href="`/admin/pages/${item.id}/edit?builder=elementor`"
+                  class="px-3 py-1.5 rounded-lg bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-500 hover:to-purple-500 text-white font-bold text-xs inline-flex items-center space-x-1.5 shadow-md shadow-pink-600/30 transition-all"
+                  title="Edit visually with Elementor Pro"
                 >
                   <Layout class="w-3.5 h-3.5" />
                   <span>Edit with Elementor</span>
                 </Link>
-                <Link
-                  v-else
-                  :href="`/admin/pages/${item.id}/edit`"
-                  class="px-3.5 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs inline-flex items-center space-x-1.5 shadow-md shadow-indigo-600/30 transition-all"
-                >
-                  <Edit class="w-3.5 h-3.5" />
-                  <span>Edit Page</span>
-                </Link>
+
                 <button @click="deletePage(item.id, item.title)" class="p-1.5 rounded-lg text-slate-500 hover:text-rose-400 hover:bg-rose-950/30 transition-colors" title="Delete Page">
                   <Trash2 class="w-4 h-4" />
                 </button>

@@ -1,8 +1,12 @@
 <script setup>
 import { ref, computed, watch, onMounted } from 'vue';
-import { useForm, Link, router } from '@inertiajs/vue3';
+import { useForm, Link, router, usePage } from '@inertiajs/vue3';
 import AdminLayout from '@/Layouts/AdminLayout.vue';
 import RichTextEditor from '@/Components/RichTextEditor.vue';
+
+const pageState = usePage();
+const activePlugins = computed(() => pageState.props.activePlugins || []);
+const isYoastSeoActive = computed(() => activePlugins.value.includes('yoast-seo-pro') || activePlugins.value.includes('seo-toolkit'));
 import {
   ArrowLeft, Save, Eye, Sparkles, Image as ImageIcon,
   Tag as TagIcon, Hash, Plus, X, Check, Lock, Unlock,
@@ -511,16 +515,17 @@ function submit(statusOverride = null) {
                       class="w-full p-3.5 rounded-xl bg-slate-950 border border-slate-800 text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-indigo-500 leading-relaxed"></textarea>
           </div>
 
-          <!-- Advanced SEO & Social Suite -->
-          <div class="p-6 rounded-2xl bg-slate-900/80 border border-slate-800 shadow-xl space-y-5">
+          <!-- Advanced SEO & Social Suite (WordPress Yoast SEO Style) -->
+          <div v-if="isYoastSeoActive" class="p-6 rounded-2xl bg-slate-900/80 border border-slate-800 shadow-xl space-y-5">
             <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-800 pb-4">
               <div class="flex items-center space-x-2">
                 <div class="p-2 rounded-xl bg-purple-500/10 text-purple-400 border border-purple-500/20">
-                  <Search class="w-4 h-4" />
+                  <Globe class="w-4 h-4 text-emerald-400" />
                 </div>
                 <div>
                   <h3 class="text-sm font-bold text-white flex items-center space-x-2">
-                    <span>Search Engine Optimization (SEO) & Social Meta</span>
+                    <span>Yoast SEO Pro Suite</span>
+                    <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 uppercase">Active</span>
                   </h3>
                   <span class="text-xs text-slate-400">Fine-tune Google search rankings, OpenGraph cards, and crawler robots</span>
                 </div>

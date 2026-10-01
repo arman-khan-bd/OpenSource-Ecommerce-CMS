@@ -290,11 +290,14 @@ const elementorWidgets = [
                     {{ page.status }}
                   </span>
                 </td>
-                <td class="py-3.5 px-4 text-right font-sans space-x-2">
+                <td class="py-3.5 px-4 text-right font-sans space-x-2 whitespace-nowrap">
                   <a :href="`/page/${page.slug}`" target="_blank" class="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs">
                     View
                   </a>
-                  <Link :href="`/admin/pages/${page.id}/edit`" class="px-3 py-1 rounded-lg bg-pink-600 hover:bg-pink-500 text-white font-semibold text-xs">
+                  <Link :href="`/admin/pages/${page.id}/edit?builder=classic`" class="px-2.5 py-1 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-xs" title="Normal page edit">
+                    Edit
+                  </Link>
+                  <Link :href="`/admin/pages/${page.id}/edit?builder=elementor`" class="px-3 py-1 rounded-lg bg-pink-600 hover:bg-pink-500 text-white font-semibold text-xs" title="Edit visually with Elementor">
                     Edit with Elementor
                   </Link>
                 </td>

@@ -62,18 +62,34 @@ const props = defineProps({
     type: Boolean,
     default: true,
   },
+  initialBuilder: {
+    type: String,
+    default: null,
+  },
 });
 
 const viewport = ref('desktop'); // 'desktop' | 'tablet' | 'mobile'
 const activeSidebarTab = ref('widgets'); // 'widgets' | 'inspector'
 const selectedBlockIndex = ref(null);
 
-// Determine initial editorMode: strictly classic if Elementor is inactive
-const editorMode = ref(
-  isElementorActive.value && props.page.meta?.builder === 'elementor'
-    ? 'elementor'
-    : 'classic'
-);
+// Determine initial editorMode: strictly classic if Elementor is inactive, or check initialBuilder/URL
+function getInitialEditorMode() {
+  if (!isElementorActive.value) return 'classic';
+
+  if (typeof window !== 'undefined') {
+    const urlParams = new URLSearchParams(window.location.search);
+    const builderParam = urlParams.get('builder');
+    if (builderParam === 'classic') return 'classic';
+    if (builderParam === 'elementor') return 'elementor';
+  }
+
+  if (props.initialBuilder === 'classic') return 'classic';
+  if (props.initialBuilder === 'elementor') return 'elementor';
+
+  return props.page.meta?.builder === 'elementor' ? 'elementor' : 'classic';
+}
+
+const editorMode = ref(getInitialEditorMode());
 
 // If Elementor gets deactivated, automatically fallback to classic editor
 watch(isElementorActive, (active) => {
@@ -341,10 +357,22 @@ function switchToElementor() {
   if (!isElementorActive.value) return;
   blocks.value = parseInitialBlocks();
   editorMode.value = 'elementor';
+  form.meta.builder = 'elementor';
+  if (typeof window !== 'undefined') {
+    const url = new URL(window.location.href);
+    url.searchParams.set('builder', 'elementor');
+    window.history.replaceState({}, '', url.toString());
+  }
 }
 
 function switchToClassic() {
   editorMode.value = 'classic';
+  form.meta.builder = 'classic';
+  if (typeof window !== 'undefined') {
+    const url = new URL(window.location.href);
+    url.searchParams.set('builder', 'classic');
+    window.history.replaceState({}, '', url.toString());
+  }
 }
 
 function savePage(status = 'published') {
@@ -1002,11 +1030,23 @@ function savePage(status = 'published') {
 
           <!-- Rich Text Content Editor -->
           <div class="space-y-2">
-            <div class="flex items-center justify-between">
+            <div class="flex flex-wrap items-center justify-between gap-2">
               <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider">
                 Page Content (Rich Text / WYSIWYG & HTML)
               </label>
-              <span class="text-[11px] text-indigo-400 font-medium">Filtered by 'the_content' hook</span>
+              <div class="flex items-center space-x-3">
+                <button
+                  v-if="isElementorActive"
+                  type="button"
+                  @click="switchToElementor"
+                  class="px-3 py-1 rounded-lg bg-pink-500/20 hover:bg-pink-500/30 text-pink-300 border border-pink-500/40 text-xs font-bold inline-flex items-center space-x-1.5 transition-all shadow-sm"
+                  title="Switch to visual drag & drop builder"
+                >
+                  <Layout class="w-3.5 h-3.5 text-pink-400" />
+                  <span>Edit with Elementor Pro</span>
+                </button>
+                <span class="text-[11px] text-indigo-400 font-medium">Filtered by 'the_content' hook</span>
+              </div>
             </div>
             <RichTextEditor
               v-model="form.content"

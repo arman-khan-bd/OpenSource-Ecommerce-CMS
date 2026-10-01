@@ -58,6 +58,12 @@ class PageController extends BaseAdminController
     {
         $pm = \App\Service\PluginManager::getInstance();
         $isElementorActive = $pm && $pm->isPluginActive('elementor-pro');
+        $builderParam = $request->query->get('builder');
+
+        $defaultBuilder = 'classic';
+        if ($builderParam === 'elementor' && $isElementorActive) {
+            $defaultBuilder = 'elementor';
+        }
 
         return $this->renderAdmin($request, 'Admin/Pages/Edit', [
             'page' => [
@@ -70,7 +76,7 @@ class PageController extends BaseAdminController
                 'status' => 'published',
                 'featured_image' => null,
                 'meta' => [
-                    'builder' => $isElementorActive ? 'elementor' : 'classic',
+                    'builder' => $defaultBuilder,
                     'builder_data' => [],
                     'seo_title' => '',
                     'seo_description' => '',
@@ -79,6 +85,7 @@ class PageController extends BaseAdminController
                 ],
             ],
             'isNew' => true,
+            'initialBuilder' => $defaultBuilder,
         ]);
     }
 
@@ -99,8 +106,13 @@ class PageController extends BaseAdminController
             $pageData['meta'] = [];
         }
 
-        // If Elementor is inactive, always default to classic WordPress editor
-        if (!$isElementorActive) {
+        $builderParam = $request->query->get('builder');
+
+        if ($builderParam === 'classic') {
+            $pageData['meta']['builder'] = 'classic';
+        } elseif ($builderParam === 'elementor' && $isElementorActive) {
+            $pageData['meta']['builder'] = 'elementor';
+        } elseif (!$isElementorActive) {
             $pageData['meta']['builder'] = 'classic';
         } elseif (!isset($pageData['meta']['builder'])) {
             $pageData['meta']['builder'] = str_contains($pageData['content'] ?? '', '[elementor') ? 'elementor' : 'classic';
@@ -109,6 +121,7 @@ class PageController extends BaseAdminController
         return $this->renderAdmin($request, 'Admin/Pages/Edit', [
             'page' => $pageData,
             'isNew' => false,
+            'initialBuilder' => $pageData['meta']['builder'],
         ]);
     }
 }
